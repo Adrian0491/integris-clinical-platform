@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>Laboratory Assessment - Central</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <h1>
+            Laboratory Assessment - Central
+        </h1>
+        <!--<h3><p>This is a mock Laboratory Assessment page for testing purposes.</p></h3>-->
+        <fieldset>
+            <label for="lab_date">Date of Laboratory Assessment:<input id="LABDATE" name="LABDATE" type="date" required /></label>
+        </fieldset>
+        <fieldset>
+            <label for="lab_time">Start Time of the Lab collection<input id="LABTIME" name="LABTIME" type="time" required /></label>
+        </fieldset>
+        <fieldset>
+            <label for="lab_result">Was Laboratory Assessment Performed?:
+                <select id="LABRESULT" name="LABRESULT">
+                    <option value="">(select one)</option>
+                    <option value="N">Yes</option>
+                    <option value="A">No</option>                    
+                </select>
+            </label>
+        </fieldset>
+        <fieldset>
+            <label for="lab_category">Laboratory category:</label>
+                <select id="LABCATEGORY" name="LABCATEGORY">
+                    <option value="">(select one)</option>
+                    <option value="HEMATOLOGY">Hematology</option>
+                    <option value="CHEMISTRY">Chemistry</option>
+                    <option value="URINALYSIS">Urinalysis</option>
+                    <option value="COAGULATION">Coagulation</option>
+                    <option value="OTHER">Other</option>                    
+                </select>
+        </fieldset>
+    </body>
+</html>

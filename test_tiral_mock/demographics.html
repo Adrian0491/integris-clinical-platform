@@ -9,21 +9,37 @@
         <h1>
             Demographics
         </h1>
-        <h3><p>This is a mock demographics page for testing purposes.</p></h3>
-
-        <h4>Demographicsdetails:</h4>
-        <ul class="assessment-list">
-            <li>
-                <label for="age">Age: <input id="AGE" name="AGE" type="number" required /></label>
-            </li>
-            <li>
+        <!--<h3><p>This is a mock demographics page for testing purposes.</p></h3>-->
+        <!--<h4>Demographics details:</h4>-->
+        <fieldset>
+            <label for="age">Age: <input id="DMAGE" name="DMAGE" type="number" required /></label>
                 <label for="gender">Gender:
-                    <select id="GENDER" name="GENDER">
-                        <option value="">(select one)</option> 
+                    <select id="DMSEX" name="DMSEX">
+                        <option value="">(select one)</option>
                         <option value="M">Male</option>
                         <option value="F">Female</option>
                     </select>
                 </label>
-            </li>
-        </ul>
+                <label for="race">Race:
+                    <select id="DMRACE" name="DMRACE">
+                        <option value="">(select one)</option>
+                        <option value="1">White</option>
+                        <option value="2">Black or African American</option>
+                        <option value="3">Asian</option>
+                        <option value="4">American Indian or Alaska Native</option>
+                        <option value="5">Native Hawaiian or Other Pacific Islander</option>
+                        <option value="6">Other</option>
+                    </select>
+                </label>
+                <label for="DMRACEOTH">Specify Other Race:<input id="DMRACEOTH" name="DMRACEOTH" type="text" required /></label>
+                <label for="ethnicity">Ethnicity:
+                    <select id="DMETHNIC" name="DMETHNIC">
+                        <option value="">(select one)</option>
+                        <option value="1">Hispanic or Latino</option>
+                        <option value="2">Not Hispanic or Latino</option>
+                        <option value="3">Unknown</option>
+                    </select>
+                </label>
+        </fieldset>
     </body>
+</html>
