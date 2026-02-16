@@ -7,35 +7,56 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <h1>
-            Laboratory Assessment - Central
-        </h1>
-        <!--<h3><p>This is a mock Laboratory Assessment page for testing purposes.</p></h3>-->
-        <fieldset>
-            <label for="lab_date">Date of Laboratory Assessment:<input id="LABDATE" name="LABDATE" type="date" required /></label>
-        </fieldset>
-        <fieldset>
-            <label for="lab_time">Start Time of the Lab collection<input id="LABTIME" name="LABTIME" type="time" required /></label>
-        </fieldset>
-        <fieldset>
-            <label for="lab_result">Was Laboratory Assessment Performed?:
-                <select id="LABRESULT" name="LABRESULT">
-                    <option value="">(select one)</option>
-                    <option value="N">Yes</option>
-                    <option value="A">No</option>                    
-                </select>
-            </label>
-        </fieldset>
-        <fieldset>
-            <label for="lab_category">Laboratory category:</label>
-                <select id="LABCATEGORY" name="LABCATEGORY">
-                    <option value="">(select one)</option>
-                    <option value="HEMATOLOGY">Hematology</option>
-                    <option value="CHEMISTRY">Chemistry</option>
-                    <option value="URINALYSIS">Urinalysis</option>
-                    <option value="COAGULATION">Coagulation</option>
-                    <option value="OTHER">Other</option>                    
-                </select>
-        </fieldset>
+        <header>
+            <h1>
+                Laboratory Assessment - Central
+            </h1>
+        </header>
+        <section>
+            <fieldset>
+                <table id="labsTable">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Date of Collection</th>
+                            <th>Time of Collection</th>
+                            <th>Reference Range</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Hematology</td>
+                            <td><input id="HEMDT" name="HEMDT" type="date" required /></td>
+                            <td><input id="HEMTM" name="HEMTM" type="time" required /></td>
+                            <td><input id="HEMREFRNG" name="HEMREFRNG" type="text" required /></td>
+                        </tr>
+                        <tr>
+                            <td>Chemistry</td>
+                            <td><input id="CHEMDT" name="CHEMDT" type="date" required /></td>
+                            <td><input id="CHEMTM" name="CHEMTM" type="time" required /></td>
+                            <td><input id="CHEMREFRNG" name="CHEMREFRNG" type="text" required /></td>
+                        </tr>
+                        <tr>
+                            <td>Urinalysis</td>
+                            <td><input id="URINDT" name="URINDT" type="date" required /></td>
+                            <td><input id="URINTM" name="URINTM" type="time" required /></td>
+                            <td><input id="URINREFRNG" name="URINREFRNG" type="text" required /></td>
+                        </tr>
+                        <tr>
+                            <td>Coagulation</td>
+                            <td><input id="COAGDT" name="COAGDT" type="date" required /></td>
+                            <td><input id="COAGTM" name="COAGTM" type="time" required /></td>
+                            <td><input id="COAGREFRNG" name="COAGREFRNG" type="text" required /></td>
+                        </tr>
+                        <tr>
+                            <td>Other</td>
+                            <td><input id="OTHERDT" name="OTHERDT" type="date" required /></td>
+                            <td><input id="OTHERTM" name="OTHERTM" type="time" required /></td>
+                            <td><input id="OTHERREFRNG" name="OTHERREFRNG" type="text" required /></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </fieldset>
+        </section>
     </body>
 </html>

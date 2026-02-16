@@ -7,28 +7,31 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <h1>
-            Pregnancy Assessment
-        </h1>
-        <!--<h3><p>This is a mock pregnancy assessment page for testing purposes.</p></h3>-->
-        <fieldset>
-            <label for="pregnant">Is the subject pregnant?
-                <select id="PREGNANT" name="PREGNANT">
-                    <option value="">(select one)</option>
-                    <option value="Y">Yes</option>
-                    <option value="N">No</option>
-                    <option value="U">Unknown</option>
-                </select>
-            </label>
-            <label for="preg_test_date">Date of Pregnancy Test:<input id="PREGTESTDT" name="PREGTESTDT" type="date" required /></label>
-            <label for="preg_test_result">Pregnancy Test Result:
-                <select id="PREGTESTRES" name="PREGTESTRES">
-                    <option value="">(select one)</option>
-                    <option value="P">Positive</option>
-                    <option value="N">Negative</option>
-                    <option value="I">Indeterminate</option>
-                </select>
-            </label>
-        </fieldset>
+        <header>
+            <h1>
+                Pregnancy Assessment
+            </h1>
+        </header>
+        <section>
+            <fieldset>
+                <label for="pregnant">Was a pregnancy test performed?
+                    <select id="RPPERF" name="Pregnancy Test Performed">
+                        <option value="">(select one)</option>
+                        <option value="Y">Yes</option>
+                        <option value="N">No</option>
+                        <option value="U">Unknown</option>
+                    </select>
+                </label>
+                <label for="preg_test_date">Date of collectionS:<input id="RPTDT" name="Collection Date" type="date" required /></label>
+                <label for="preg_test_result">Pregnancy test result:
+                    <select id="RPORRES" name="Pregnancy Test Result">
+                        <option value="">(select one)</option>
+                        <option value="P">Positive</option>
+                        <option value="N">Negative</option>
+                        <option value="I">Indeterminate</option>
+                    </select>
+                </label>
+            </fieldset>
+        </section>
     </body>
 </html>

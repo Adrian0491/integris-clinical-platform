@@ -7,34 +7,37 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <h1>
-            ECG
-        </h1>
-        <!--<h3><p>This is a mock ECG page for testing purposes.</p></h3>-->
-        <fieldset>
-            <label for="ecg_date">Date of ECG:<input id="ECGDATE" name="ECGDATE" type="date" required /></label>
-        </fieldset>
-        <fieldset>
-            <label for="ecg_result">Was ECG Performed?:
-                <select id="ECGRESULT" name="ECGRESULT">
-                    <option value="">(select one)</option>
-                    <option value="N">Yes</option>
-                    <option value="A">No</option>                    
-                </select>
-            </label>
-        </fieldset>
-        <fieldset>
-            <label for="ecg_notes">ECG Reference Identifier/Accession Number<textarea id="ECGNOTES" name="ECGNOTES"></textarea></label>
-        </fieldset>
-        <fieldset>
-            <legend>ECG Method:</legend>
-            <label> <input id="ECGMETHOD_12LEAD" name="ECGMETHOD" type="radio" value="12LEAD" checked>12 Lead Standard</label>
-        </fieldset>
-        <fieldset>
-            <legend>Position:</legend>
-            <label for="ecg_position">Supine<input id="ECGPOSITION" name="ECGPOSITION" type="radio" /></label>
-            <label for="ecg_position_standing">Standing<input id="ECGPOSITION_STANDING" name="ECGPOSITION_STANDING" type="radio" /></label>
-            <label for="ecg_position_sitting">Sitting<input id="ECGPOSITION_SITTING" name="ECGPOSITION_SITTING" type="radio" /></label>
-        </fieldset>
+        <header>
+            <h1>ECG Assessment</h1>
+        </header>
+        <section>
+            <fieldset>
+                <label for="ecg_result">Was ECG Performed?:
+                    <select id="ECGRESULT" name="ECGRESULT">
+                        <option value="">(select one)</option>
+                        <option value="N">Yes</option>
+                        <option value="A">No</option>
+                    </select>
+                </label>
+                <label for="ecg_date">Date of ECG:<input id="ECGDATE" name="ECGDATE" type="date" required /></label>
+            </fieldset>
+        </section>
+        <section>
+            <fieldset>
+                <legend>ECG Method:</legend>
+                <label> <input id="ECGMETHOD_12LEAD" name="ECGMETHOD" type="radio" value="12LEAD" checked>12 Lead Standard</label>
+                <legend>Position:</legend>
+                <label for="ecg_position">Supine<input id="ECGPOSITION" name="ECGPOSITION" type="radio" /></label>
+                <label for="ecg_position_standing">Standing<input id="ECGPOSITION_STANDING" name="ECGPOSITION_STANDING"
+                        type="radio" /></label>
+                <label for="ecg_position_sitting">Sitting<input id="ECGPOSITION_SITTING" name="ECGPOSITION_SITTING"
+                        type="radio" /></label>
+            </fieldset>
+        </section>
+        <section>
+            <fieldset>
+                <label for="ecg_notes">ECG Reference Identifier/Accession Number<textarea id="ECGNOTES" name="ECGNOTES"></textarea></label>
+            </fieldset>
+        </section>
     </body>
 </html>
