@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Severe Events</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <main>
+            <header>
+                <h1>Severe Events</h1>
+                <fieldset>
+                    <label for="clinicalEventsExperienced">Were any severe events experienced?</label>
+                    <select name="clinicalEventsExperienced" id="CEYN">
+                        <option value="0">Yes</option>
+                        <option value="1">No</option>
+                    </select>
+                </fieldset>
+            </header>
+        </main>
+        <section>
+            <fieldset>
+                <label for="clinicalEventDescription">Clinical Event<input type="text" id="CEDESC" name="clinicalEventDescription"></label>
+                <label for="clinicalEventStartDate">Clinical Event Start Date<input type="date" id="CESTDT" name="clinicalEventStartDate"></label>
+                <label for="clinicalEventOngoing">Is the clinical event ongoing?
+                    <select id="CEOING" name="clinicalEventOngoing" required>
+                        <option value="">(select one)</option>
+                        <option value="1">Yes</option>
+                        <option value="2">No</option>
+                    </select>
+                </label>
+                <label for="clinicalEventEndDate">Clinical Event End Date<input type="date" id="CEENDT" name="clinicalEventEndDate"></label>
+                <label for="severity">Severity
+                    <select id="CESEV" name="severity" required>
+                        <option value="">(select one)</option>
+                        <option value="1">Mild</option>
+                        <option value="2">Moderate</option>
+                        <option value="3">Severe</option>
+                    </select>
+                </label>
+            </fieldset>
+        </section>
+    </body>
+</html>
