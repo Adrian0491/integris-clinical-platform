@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/Adrian0491/ClinicalDataComplianceTool-Prototype.git"
   },
-  "author": "",
+  "author": "Adrian Pircalaboiu",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/Adrian0491/ClinicalDataComplianceTool-Prototype/issues"
