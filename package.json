@@ -1,0 +1,19 @@
+{
+  "name": "clinicaldatacompliancetool-prototype",
+  "version": "1.0.0",
+  "description": "**Early-stage prototype for secure, real-time clinical data validation and compliance monitoring**   Initiated in January 2026 to showcase tangible progress toward building scalable Electronic Data Capture (EDC) infrastructure for clinical trials.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Adrian0491/ClinicalDataComplianceTool-Prototype.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Adrian0491/ClinicalDataComplianceTool-Prototype/issues"
+  },
+  "homepage": "https://github.com/Adrian0491/ClinicalDataComplianceTool-Prototype#readme"
+}
