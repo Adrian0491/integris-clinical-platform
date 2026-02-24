@@ -2,13 +2,19 @@ import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from '@ang
 import { fromEvent, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+
 @Component({
   selector: 'app-save-button',
   standalone: true,
-  imports: [],
+  imports: [
+    MatButtonModule,
+    MatIconModule,],
   templateUrl: './save-button.ng.html',
   styleUrls: ['./save-button.css']
 })
+  
 export class SaveButtonComponent implements OnInit, OnDestroy {
 
   /** Prefix for the downloaded file (date will be added automatically) */
