@@ -1,4 +1,9 @@
-<button mat-raised-button type="button" class="save-btn" [disabled]="disabled || loading" (click)="onClick()">
-    <span *ngIf="loading">Saving...</span>
-    <span *ngIf="!loading">{{ label }}</span>
+<button 
+  mat-raised-button 
+  color="primary" 
+  #saveBtn 
+  class="save-btn"
+  aria-label="Save compliance report as HTML">
+  <mat-icon>save</mat-icon>
+  Save as HTML
 </button>
