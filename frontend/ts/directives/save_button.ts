@@ -1,53 +1,65 @@
-import { Component, DestroyRef, inject } from '@angular/core';
-import { Subject, of } from 'rxjs';
-import { exhaustMap, finalize, tap, delay } from 'rxjs/operators';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, OnInit, OnDestroy, Input, ViewChild, ElementRef } from '@angular/core';
+import { fromEvent, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
-    selector: 'app-other',
-    templateUrl: './other.component.html',
+  selector: 'app-save-button',
+  standalone: true,
+  imports: [],
+  templateUrl: './save-button.ng.html',
+  styleUrls: ['./save-button.css']
 })
+export class SaveButtonComponent implements OnInit, OnDestroy {
 
-export class OtherComponent {
-    private destroyRef = inject(DestroyRef);
-    private saveClick$ = new Subject<void>();
+  /** Prefix for the downloaded file (date will be added automatically) */
+  @Input() filenamePrefix: string = 'clinical-compliance-report';
 
-    //variables you want to store
-    siteId = '';
-    studyName = '';
-    notes = '';
+  /** Optional: pass your own clean HTML string if you don't want the whole page */
+  @Input() customHTML?: string;
 
-    isSaving = false;
+  @ViewChild('saveBtn') private saveBtnRef!: ElementRef<HTMLButtonElement>;
 
-    constructor() {
-        this.saveClick$
-            .pipe(
-                tap(() => (this.isSaving = true)),
-                exhaustMap(() => {
-                    // build payload from variables
-                    const payload = {
-                        siteId: this.siteId,
-                        studyName: this.studyName,
-                        notes: this.notes,
-                    };
+  private destroy$ = new Subject<void>();
 
-                    console.log('Saving payload:', payload);
-
-                    // replace this with HttpClient call:
-                    // return this.http.post('/api/save', payload)
-                    return of(payload).pipe(delay(800));
-                }),
-                finalize(() => (this.isSaving = false)),
-                takeUntilDestroyed(this.destroyRef)
-            )
-            .subscribe();
+  ngOnInit(): void {
+    if (!this.saveBtnRef?.nativeElement) {
+      console.warn('SaveButtonComponent: button ref not found');
+      return;
     }
 
-    triggerSave() {
-        this.saveClick$.next();
-    }
+    // RxJS Observable on click → save when pressed
+    fromEvent(this.saveBtnRef.nativeElement, 'click')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        console.log('Save clicked → generating HTML report...');
+        this.performSave();
+      });
+  }
 
-    ngOnInit(){
-        this.siteId = 'site123';
-    }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    console.log('SaveButtonComponent destroyed – observable cleaned up');
+  }
+
+  private performSave(): void {
+    // Use custom HTML if provided, otherwise full current page (Option 1)
+    let content = this.customHTML || document.documentElement.outerHTML;
+
+    const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const fullFilename = `${this.filenamePrefix}-${timestamp}.html`;
+
+    const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fullFilename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    console.log(`Report saved → ${fullFilename}`);
+  }
 }
