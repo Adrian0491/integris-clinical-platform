@@ -1,25 +1,15 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {MatButtonModule} from '@angular/material/button';
+import {MatDialogModule} from '@angular/material/dialog';
 
 @Component({
-    selector: 'app-ui-service',
-    template: `
-    <button (click)="openDialog()">Open Dialog</button>
-
-    <div *ngIf="isDialogOpen" class="bp3-dialog">
-      <h2>Dialog Title</h2>
-      <div>This is the content of the dialog.</div>
-      <button (click)="closeDialog()">Close</button>
-    </div>
-  `
+    
 })
-export class UiServiceComponent {
-    isDialogOpen = false;
 
-    openDialog() {
-        this.isDialogOpen = true;
-    }
+export class UiService {
+  constructor() {}
 
-    closeDialog() {
-        this.isDialogOpen = false;
-    }
+  openDialog() {
+    // Logic to open a dialog using MatDialog
+  }
 }
