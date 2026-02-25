@@ -18,7 +18,8 @@ import { MatIconModule } from '@angular/material/icon';
 export class SaveButtonComponent implements OnInit, OnDestroy {
 
   /** Prefix for the downloaded file (date will be added automatically) */
-  @Input() filenamePrefix: string = 'clinical-compliance-report';
+  /** @Input() filenamePrefix: string = 'clinical-compliance-report'; */
+  @Input() 
 
   /** Optional: pass your own clean HTML string if you don't want the whole page */
   @Input() customHTML?: string;
