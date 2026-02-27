@@ -7,37 +7,45 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <header>
-            <h1>
-                Informed Consent
-            </h1>
-            <!--<h3><p>This is a mock informed consent page for testing purposes.</p></h3>-->            
-        </header>
-        <section>
-            <fieldset>
-                <h4>Informed consent details:</h4>
-                <label for="visit-date">Informed Consent Date: <input id="ICDT" name="ICDT" type="date" required /></label>
-                    <label for="referrer">Was Informed Consent signed by the patient?
-                        <select id="referrer" name="referrer">
-                            <option value="">(select one)</option>
-                                <option value="1">Yes</option>
-                                <option value="2">No</option>
-                        </select>
-                    </label>
-            </fieldset>
-        </section>
-        <section>
-            <fieldset>
-                <h4>Future study informed consent</h4>
-                <label for="visit-date">Future Informed Consent Date: <input id="FICDT" name="FICDT" type="date" required /></label>
-                    <label for="referrer">Was the future study informed consent signed by the patient?
-                        <select id="referrer" name="referrer">
-                            <option value="">(select one)</option>
-                            <option value="1">Yes</option>
-                            <option value="2">No</option>
-                        </select>
-                    </label>
-            </fieldset>
-        </section>
+        <main>
+            <div>
+                <header>
+                    <h1>
+                        Informed Consent
+                    </h1>
+                    <!--<h3><p>This is a mock informed consent page for testing purposes.</p></h3>-->            
+                </header>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <h4>Informed consent details:</h4>
+                        <label for="visit-date">Informed Consent Date: <input id="ICDT" name="ICDT" type="date" required /></label>
+                            <label for="referrer">Was Informed Consent signed by the patient?
+                                <select id="referrer" name="referrer">
+                                    <option value="">(select one)</option>
+                                        <option value="1">Yes</option>
+                                        <option value="2">No</option>
+                                </select>
+                            </label>
+                    </fieldset>
+                </section>
+            </div>
+             <div>
+                <section>
+                    <fieldset>
+                        <h4>Future study informed consent</h4>
+                        <label for="visit-date">Future Informed Consent Date: <input id="FICDT" name="FICDT" type="date" required /></label>
+                            <label for="referrer">Was the future study informed consent signed by the patient?
+                                <select id="referrer" name="referrer">
+                                    <option value="">(select one)</option>
+                                    <option value="1">Yes</option>
+                                    <option value="2">No</option>
+                                </select>
+                            </label>
+                    </fieldset>
+                </section>
+            </div>
+        </main>
     </body>
 </html>

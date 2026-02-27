@@ -11,6 +11,7 @@
             <h1>Medical History</h1>
         </header>
         <main>
+            <div>
             <section>
                 <fieldset>
                     <label for="medicalHistory">Were any medical conditions or events reported?
@@ -23,37 +24,48 @@
                     <label for="medicalEventDate">Medical Event Date<input type="date" id="MHDT" name="medicalEventDate"></label>
                 </fieldset>                
             </section>
-            <section>
-                <fieldset>
-                    <label for="medicalHistoryDetails">If yes, please provide details of the medical history.<input type="text" id="MHDESC" name="medicalHistoryDetails"></label>
-                </fieldset>
-            </section>
-            <section>
-                <fieldset>
-                    <label for="medicalHistoryCondition">What is the medical condition or event term?<input type="text" id="MHCOND" name="medicalHistoryCondition"></label>                      
-                </fieldset>
-            </section>
-            <section>
-                <fieldset>
-                    <label for="medicalConditionStartDate">What [is/was] the [medical event or condition/category of the event] start date?<input type="date" id="MHSTDT" name="medicalConditionStartDate"></label>
-                </fieldset>
-            </section>
-            <section>
-                <fieldset>
-                    <label for="medicalConditionOngoing">Is the medical condition or event ongoing (as of the [study-specific timepoint or period])?
-                        <select id="MHOING" name="medicalConditionOngoing" required>
-                            <option value="">(select one)</option>
-                            <option value="1">Yes</option>
-                            <option value="2">No</option>
-                        </select>
-                    </label>
-                </fieldset>
-            </section>
-            <section>
-                <fieldset>
-                    <label for="medicalConditionEndDate">What [is/was] the [medical event or condition/category of the event] end date?<input type="date" id="MHENDT" name="medicalConditionEndDate"></label>
-                </fieldset>
-            </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="medicalHistoryDetails">If yes, please provide details of the medical history.<input type="text" id="MHDESC" name="medicalHistoryDetails"></label>
+                    </fieldset>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="medicalHistoryCondition">What is the medical condition or event term?<input type="text" id="MHCOND" name="medicalHistoryCondition"></label>                      
+                    </fieldset>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="medicalConditionStartDate">What [is/was] the [medical event or condition/category of the event] start date?<input type="date" id="MHSTDT" name="medicalConditionStartDate"></label>
+                    </fieldset>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="medicalConditionOngoing">Is the medical condition or event ongoing (as of the [study-specific timepoint or period])?
+                            <select id="MHOING" name="medicalConditionOngoing" required>
+                                <option value="">(select one)</option>
+                                <option value="1">Yes</option>
+                                <option value="2">No</option>
+                            </select>
+                        </label>
+                    </fieldset>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="medicalConditionEndDate">What [is/was] the [medical event or condition/category of the event] end date?<input type="date" id="MHENDT" name="medicalConditionEndDate"></label>
+                    </fieldset>
+                </section>
+            </div>
         </main>
     </body>
 </html>

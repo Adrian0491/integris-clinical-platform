@@ -7,68 +7,78 @@
         <link rel="stylesheet" href="styles.css">
     </head>
     <body>
-        <header>
-            <h1>
-                Vital Signs
-            </h1>
-        </header>
-        <section>
-            <fieldset>
-                <label for="vitalSignsDate">Vital Signs Date: <input id="VSDT" name="VSDT" type="date" required /></label>
-                    <label for="referrer">Were the vital signs taken?
-                        <select id="VSPERF" name="referrer">
-                            <option value="">(select one)</option>
-                                <option value="1">Yes</option>
-                                <option value="2">No</option>
-                        </select>
-                    </label>
-            </fieldset>
-            <fieldset>
-                <label for="height">Height:<input id="VSORRESH" name="height" type="number" required /></label>
-                <label for="heightUnit">Height Unit?
-                    <select id="heightUnit" name="heightUnit">
-                        <option value="">(select one)</option>
-                        <option value="1">cm</option>
-                        <option value="2">in</option>
-                    </select>
-                </label>
-            </fieldset>
-            <fieldset>
-                <label for="weight">Weight:<input id="VSORRESW" name="weight" type="number" required /></label>
-                <label for="Weight Unit">Weight Unit?
-                    <select id="weightUnit" name="weightUnit">
-                        <option value="">(select one)</option>
-                        <option value="1">kg</option>
-                        <option value="2">lb</option>
-                    </select>
-                </label>
-            </fieldset>
-        </section>
-        <section>
-            <fieldset>
-                <label for="temperature">Temperature:<input id="VSORREST" name="temperature" type="number" required /></label>
-                <label for="temperatureUnit">Temperature Unit?
-                    <select id="temperatureUnit" name="temperatureUnit">
-                        <option value="">(select one)</option>
-                        <option value="1">C</option>
-                        <option value="2">F</option>
-                    </select>
-            </fieldset>
-        </section>
-        <section>
-            <fieldset>
-                <label for="systolicBP">Systolic Blood Pressure(mmHg):<input id="VSORRESSBP" name="systolicBP" type="number" required /></label>
-                <label for="diastolicBP">Diastolic Blood Pressure(mmHg):<input id="VSORREDBP" name="diastolicBP" type="number" required /></label>
-                <label for="Position"> Blood Pressure Position:
-                    <select id="position" name="position">
-                        <option value="">(select one)</option>
-                        <option value="1">Supine</option>
-                        <option value="2">Sitting</option>
-                        <option value="3">Standing</option>
-                    </select>
-                </label>
-                <label for="heartRate">Heart Rate(bpm):<input id="VSORRESHR" name="heartRate" type="number" required /></label>
-            </fieldset>
-        </section>
+        <main>
+            <div>
+                <header>
+                    <h1>
+                        Vital Signs
+                    </h1>
+                </header>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="vitalSignsDate">Vital Signs Date: <input id="VSDT" name="VSDT" type="date" required /></label>
+                            <label for="referrer">Were the vital signs taken?
+                                <select id="VSPERF" name="referrer">
+                                    <option value="">(select one)</option>
+                                        <option value="1">Yes</option>
+                                        <option value="2">No</option>
+                                </select>
+                            </label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="height">Height:<input id="VSORRESH" name="height" type="number" required /></label>
+                        <label for="heightUnit">Height Unit?
+                            <select id="heightUnit" name="heightUnit">
+                                <option value="">(select one)</option>
+                                <option value="1">cm</option>
+                                <option value="2">in</option>
+                            </select>
+                        </label>
+                    </fieldset>
+                    <fieldset>
+                        <label for="weight">Weight:<input id="VSORRESW" name="weight" type="number" required /></label>
+                        <label for="Weight Unit">Weight Unit?
+                            <select id="weightUnit" name="weightUnit">
+                                <option value="">(select one)</option>
+                                <option value="1">kg</option>
+                                <option value="2">lb</option>
+                            </select>
+                        </label>
+                    </fieldset>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="temperature">Temperature:<input id="VSORREST" name="temperature" type="number" required /></label>
+                        <label for="temperatureUnit">Temperature Unit?
+                            <select id="temperatureUnit" name="temperatureUnit">
+                                <option value="">(select one)</option>
+                                <option value="1">C</option>
+                                <option value="2">F</option>
+                            </select>
+                    </fieldset>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="systolicBP">Systolic Blood Pressure(mmHg):<input id="VSORRESSBP" name="systolicBP" type="number" required /></label>
+                        <label for="diastolicBP">Diastolic Blood Pressure(mmHg):<input id="VSORREDBP" name="diastolicBP" type="number" required /></label>
+                        <label for="Position"> Blood Pressure Position:
+                            <select id="position" name="position">
+                                <option value="">(select one)</option>
+                                <option value="1">Supine</option>
+                                <option value="2">Sitting</option>
+                                <option value="3">Standing</option>
+                            </select>
+                        </label>
+                        <label for="heartRate">Heart Rate(bpm):<input id="VSORRESHR" name="heartRate" type="number" required /></label>
+                    </fieldset>
+                </section>
+            </div>
+        </main>
     </body>
 </html>
