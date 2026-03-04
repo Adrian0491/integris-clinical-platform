@@ -39,7 +39,7 @@ def validate_dm(df: pl.DataFrame) -> pl.DataFrame:
     """
     SDTM DM-like checks (subset).
     Returns findings table (one row per issue).
-    """
+    """ 
     findings = []
 
     # DM_001: USUBJID required

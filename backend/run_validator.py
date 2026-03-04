@@ -1,5 +1,5 @@
 import os
-import polars as pl
+#import polars as pl
 
 from edc_validator.domain_validation import (
     validate_vs, validate_ae, validate_cm,
