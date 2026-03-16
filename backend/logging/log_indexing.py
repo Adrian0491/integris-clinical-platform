@@ -79,9 +79,9 @@ class Logging:
 if __name__ == "__main__":
     log = Logging()
 
-    print(log.info("Scan started."))
-    print(log.warning("No DKIM record found."))
-    print(log.error("Failed to connect to AbuseIPDB."))
+    print(log.info("Logging started."))
+    print(log.warning("No records found."))
+    print(log.error("Failed!"))
 
     result = log.push_logs_to_github()
     print(result)

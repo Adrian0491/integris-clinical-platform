@@ -19,10 +19,8 @@ Notes:
     but not a complete replacement for formal SDTMIG validation tools.
   - Date parsing uses ISO 8601 "YYYY-MM-DD" (subset) for MVP stability.
 """
-
 from __future__ import annotations
-
-#import polars as pl
+import polars as pl
 
 
 # -----------------------------
