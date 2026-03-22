@@ -1,15 +1,20 @@
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 import socket
 import struct
 import threading
 import time
-from typing import Optional
 
-from attr import dataclass
+from typing import Dict, Optional, TypedDict
+from dataclasses import dataclass
 
-from backend.logging import Logging
 from flask import Flask, Response, request, jsonify
-from types import Dict, TypedDict
-
+from backend.logging.log_indexing import Logging
 
 @dataclass
 class Lease:
