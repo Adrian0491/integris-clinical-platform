@@ -1,341 +1,182 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Dict, Any, List, Optional, Tuple
-
-import polars as pl
 import json
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
-from edc_validator.sdtm_rules import validate_dm
-from edc_validator.domain_validation import validate_vs, validate_ae, validate_cm  # adjust names to your file
-from edc_validator.run_validator import validate_dm_link  # if you already have this helper
+import pandas as pd
+
+from bk.schemas import (
+    FINDINGS_COLUMNS,
+    FINDINGS_DTYPES,
+    concat_findings,
+    dataset_finding,
+    empty_findings,
+)
+
+
+class DatasetJsonIO:
+    """Loads a Dataset-JSON document and extracts domain datasets as DataFrames."""
+
+    def __init__(self, finding_type: str = "DATASET_JSON") -> None:
+        self.finding_type = finding_type
+
+    def _finding(self, rule_id: str, severity: str, field: str, message: str,
+                 row_index: int = -1, evidence: str = "") -> pd.DataFrame:
+        row = {
+            "finding_type": self.finding_type, "rule_id": rule_id,
+            "severity": severity, "domain": "DATASET_JSON",
+            "field": field, "message": message,
+            "row_index": row_index, "usubjid": "", "evidence": evidence,
+        }
+        return pd.DataFrame([row], columns=FINDINGS_COLUMNS).astype(FINDINGS_DTYPES)
+
+    def load(self, path: str | Path) -> Dict[str, Any]:
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+
+    def validate_top_level(self, doc: Dict[str, Any]) -> pd.DataFrame:
+        findings = []
+        if not isinstance(doc, dict):
+            return self._finding("DJ_001", "CRIT", "root",
+                                 "Dataset-JSON document must be a JSON object.")
+        root_key = next((k for k in ("clinicalData", "referenceData") if k in doc), None)
+        if root_key is None:
+            return self._finding("DJ_002", "CRIT", "clinicalData/referenceData",
+                                 "Document must have a 'clinicalData' or 'referenceData' key.")
+        root = doc[root_key]
+        if not isinstance(root, dict):
+            findings.append(self._finding("DJ_002b", "CRIT", root_key,
+                                          f"{root_key} must be a JSON object."))
+        elif "itemGroupData" not in root:
+            findings.append(self._finding("DJ_003", "CRIT", "itemGroupData",
+                                          "Missing 'itemGroupData' in document."))
+        elif not isinstance(root["itemGroupData"], dict):
+            findings.append(self._finding("DJ_004", "CRIT", "itemGroupData",
+                                          "itemGroupData must be an object."))
+        return concat_findings(findings)
+
+    def _get_ig_map(self, doc: Dict[str, Any]) -> Dict[str, Any]:
+        for k in ("clinicalData", "referenceData"):
+            if k in doc:
+                return doc[k].get("itemGroupData", {})
+        return {}
+
+    def list_itemgroups(self, doc: Dict[str, Any]) -> List[str]:
+        return list(self._get_ig_map(doc).keys())
+
+    def infer_oid(self, doc: Dict[str, Any], domain: str) -> Optional[str]:
+        domain_u = domain.strip().upper()
+        ig = self._get_ig_map(doc)
+        for k, ds in ig.items():
+            if isinstance(ds, dict) and str(ds.get("name", "")).upper() == domain_u:
+                return str(k)
+        for k in ig:
+            ku = str(k).upper()
+            if ku.endswith(domain_u) or f".{domain_u}" in ku:
+                return str(k)
+        return None
+
+    def itemgroup_to_df(self, doc: Dict[str, Any], oid: str
+                        ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        findings = []
+        ig  = self._get_ig_map(doc)
+        ds  = ig.get(oid)
+        if ds is None or not isinstance(ds, dict):
+            return pd.DataFrame(), self._finding("DJ_100", "CRIT", "itemGroupData",
+                                                  f"OID '{oid}' not found.")
+        items     = ds.get("items", [])
+        item_data = ds.get("itemData", [])
+
+        if not isinstance(items, list) or not items:
+            return pd.DataFrame(), self._finding("DJ_101", "CRIT", f"{oid}.items",
+                                                  "Non-empty 'items' array required.")
+        if not isinstance(item_data, list):
+            return pd.DataFrame(), self._finding("DJ_102", "CRIT", f"{oid}.itemData",
+                                                  "'itemData' must be an array.")
+
+        col_names = [str(it.get("name") or it.get("OID") or f"COL_{i}")
+                     for i, it in enumerate(items) if isinstance(it, dict)]
+        if not col_names:
+            return pd.DataFrame(), self._finding("DJ_104", "CRIT", f"{oid}.items",
+                                                  "Could not derive column names.")
+
+        rows = []
+        for r_idx, rec in enumerate(item_data):
+            if not isinstance(rec, list):
+                findings.append(self._finding("DJ_105", "HIGH", f"{oid}.itemData[{r_idx}]",
+                                              "Each record must be an array.", row_index=r_idx))
+                continue
+            if len(rec) != len(col_names):
+                findings.append(self._finding("DJ_106", "HIGH", f"{oid}.itemData[{r_idx}]",
+                                              "Record length mismatch.", row_index=r_idx,
+                                              evidence=f"got {len(rec)}, expected {len(col_names)}"))
+            rows.append((rec + [None] * len(col_names))[: len(col_names)])
+
+        df = pd.DataFrame(rows, columns=col_names) if rows else pd.DataFrame(columns=col_names)
+        return df, concat_findings(findings)
+
+    def domain_to_df(self, doc: Dict[str, Any], domain: str
+                     ) -> Tuple[pd.DataFrame, pd.DataFrame, Optional[str]]:
+        oid = self.infer_oid(doc, domain)
+        if oid is None:
+            return pd.DataFrame(), self._finding(
+                "DJ_110", "CRIT", "domain",
+                f"Could not infer OID for domain '{domain}'.",
+                evidence="; ".join(self.list_itemgroups(doc)),
+            ), None
+        df, f = self.itemgroup_to_df(doc, oid)
+        return df, f, oid
 
 
 @dataclass
 class DatasetJsonValidationResult:
-    datasets: Dict[str, pl.DataFrame]
-    findings: pl.DataFrame
+    datasets: Dict[str, pd.DataFrame] = field(default_factory=dict)
+    findings: pd.DataFrame            = field(default_factory=empty_findings)
 
 
-class DatasetJsonIO:
-    """
-    Dataset-JSON loader + lightweight structural validator + extractor to Polars.
+class DatasetJsonValidator:
+    """Orchestrates Dataset-JSON structural + SDTM domain validation."""
 
-    Design goals:
-    - Best-effort parsing to Polars DataFrame for a dataset (ItemGroup).
-    - Generate findings as a Polars DataFrame with a consistent schema.
-    - Avoid hard dependency on Define-XML for now (structural checks only).
-    """
+    def __init__(self, io: Optional[DatasetJsonIO] = None) -> None:
+        self.io = io or DatasetJsonIO()
 
-    FINDINGS_SCHEMA = {
-        "finding_type": pl.Utf8,
-        "rule_id": pl.Utf8,
-        "severity": pl.Utf8,
-        "field": pl.Utf8,
-        "message": pl.Utf8,
-        "row_index": pl.Int64,
-        "evidence": pl.Utf8,
-    }
-
-    def __init__(self, *, finding_type: str = "DATASET_JSON"):
-        self.finding_type = finding_type
-
-    # ---------- Findings helpers ----------
-
-    def empty_findings(self) -> pl.DataFrame:
-        return pl.DataFrame(schema=self.FINDINGS_SCHEMA)
-
-    def finding(
-        self,
-        rule_id: str,
-        severity: str,
-        field: str,
-        message: str,
-        *,
-        row_index: int = -1,
-        evidence: str = "",
-    ) -> pl.DataFrame:
-        return pl.DataFrame(
-            {
-                "finding_type": [self.finding_type],
-                "rule_id": [rule_id],
-                "severity": [severity],
-                "field": [field],
-                "message": [message],
-                "row_index": [row_index],
-                "evidence": [evidence],
-            },
-            schema=self.FINDINGS_SCHEMA,
+    def validate(self, doc: Dict[str, Any],
+                 domains: Optional[List[str]] = None) -> DatasetJsonValidationResult:
+        from bk.validator.domain import (
+            validate_ae, validate_cm, validate_dm, validate_dm_link, validate_vs,
         )
+        if domains is None:
+            domains = ["DM", "VS", "AE", "CM"]
 
-    def concat_findings(self, parts: List[pl.DataFrame]) -> pl.DataFrame:
-        parts = [p for p in parts if isinstance(p, pl.DataFrame) and p.width > 0]
-        if not parts:
-            return self.empty_findings()
-        return pl.concat(parts, how="vertical_relaxed")
+        datasets: Dict[str, pd.DataFrame] = {}
+        parts: List[pd.DataFrame] = [self.io.validate_top_level(doc)]
 
-    # ---------- IO ----------
+        for domain in domains:
+            df, f, _ = self.io.domain_to_df(doc, domain)
+            datasets[domain] = df
+            parts.append(f)
 
-    def load(self, path: Union[str, Path]) -> Dict[str, Any]:
-        """Load Dataset-JSON from a path."""
-        p = Path(path)
-        with p.open("r", encoding="utf-8") as f:
-            return json.load(f)
+        dm_df = datasets.get("DM", pd.DataFrame())
+        if len(dm_df): parts.append(validate_dm(dm_df))
 
-    # ---------- Structure inspection ----------
+        vs_df = datasets.get("VS", pd.DataFrame())
+        if len(vs_df): parts.append(validate_vs(vs_df))
 
-    def get_root(self, doc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Return clinicalData or referenceData object."""
-        root = doc.get("clinicalData") or doc.get("referenceData")
-        return root if isinstance(root, dict) else None
+        ae_df = datasets.get("AE", pd.DataFrame())
+        if len(ae_df): parts.append(validate_ae(ae_df))
 
-    def get_itemgroup_map(self, doc: Dict[str, Any]) -> Dict[str, Any]:
-        """Return itemGroupData mapping or empty dict."""
-        root = self.get_root(doc) or {}
-        ig = root.get("itemGroupData") or {}
-        return ig if isinstance(ig, dict) else {}
+        cm_df = datasets.get("CM", pd.DataFrame())
+        if len(cm_df): parts.append(validate_cm(cm_df))
 
-    def list_itemgroups(self, doc: Dict[str, Any]) -> List[str]:
-        return list(self.get_itemgroup_map(doc).keys())
+        if len(dm_df):
+            for dom in ["VS", "AE", "CM"]:
+                ddf = datasets.get(dom, pd.DataFrame())
+                if len(ddf):
+                    parts.append(validate_dm_link(dm_df, ddf, dom))
 
-    def validate_top_level(self, doc: Dict[str, Any]) -> pl.DataFrame:
-        """
-        Lightweight structural validation (not full schema validation).
-        Returns findings DataFrame.
-        """
-        findings: List[pl.DataFrame] = []
-
-        # DJ_000: required fields
-        for req in ("creationDateTime", "datasetJSONVersion"):
-            if req not in doc:
-                findings.append(
-                    self.finding(
-                        rule_id="DJ_000",
-                        severity="CRIT",
-                        field=req,
-                        message=f"Missing required top-level attribute: {req}",
-                    )
-                )
-
-        # DJ_001: must have clinicalData or referenceData
-        has_clinical = "clinicalData" in doc
-        has_reference = "referenceData" in doc
-        if not (has_clinical or has_reference):
-            findings.append(
-                self.finding(
-                    rule_id="DJ_001",
-                    severity="CRIT",
-                    field="clinicalData/referenceData",
-                    message="Dataset-JSON must include either clinicalData or referenceData.",
-                )
-            )
-            return self.concat_findings(findings)
-
-        # DJ_002: root must be object
-        root = doc.get("clinicalData") or doc.get("referenceData")
-        if not isinstance(root, dict):
-            findings.append(
-                self.finding(
-                    rule_id="DJ_002",
-                    severity="CRIT",
-                    field="clinicalData/referenceData",
-                    message="clinicalData/referenceData must be a JSON object.",
-                    evidence=str(type(root)),
-                )
-            )
-            return self.concat_findings(findings)
-
-        # DJ_003/004: itemGroupData existence and type
-        if "itemGroupData" not in root:
-            findings.append(
-                self.finding(
-                    rule_id="DJ_003",
-                    severity="CRIT",
-                    field="itemGroupData",
-                    message="Missing itemGroupData object under clinicalData/referenceData.",
-                )
-            )
-        elif not isinstance(root.get("itemGroupData"), dict):
-            findings.append(
-                self.finding(
-                    rule_id="DJ_004",
-                    severity="CRIT",
-                    field="itemGroupData",
-                    message="itemGroupData must be a JSON object mapping dataset OIDs to datasets.",
-                    evidence=str(type(root.get("itemGroupData"))),
-                )
-            )
-
-        return self.concat_findings(findings)
-
-    # ---------- Domain helpers ----------
-
-    def infer_itemgroup_oid_for_domain(self, doc: Dict[str, Any], domain: str) -> Optional[str]:
-        """
-        Best-effort: return itemGroup OID whose dataset 'name' equals domain.
-        Falls back to key heuristics (endswith domain or contains '.DOMAIN').
-        """
-        domain_u = domain.strip().upper()
-        ig = self.get_itemgroup_map(doc)
-
-        # Prefer dataset objects with ds['name'] == domain
-        for k, ds in ig.items():
-            if isinstance(ds, dict) and str(ds.get("name", "")).upper() == domain_u:
-                return str(k)
-
-        # Fallback: key heuristics (e.g., "IG.DM")
-        for k in ig.keys():
-            ku = str(k).upper()
-            if ku.endswith(domain_u) or f".{domain_u}" in ku:
-                return str(k)
-
-        return None
-
-    # ---------- Extraction ----------
-
-    def get_itemgroup(self, doc: Dict[str, Any], itemgroup_oid: str) -> Optional[Dict[str, Any]]:
-        ds = self.get_itemgroup_map(doc).get(itemgroup_oid)
-        return ds if isinstance(ds, dict) else None
-
-    def itemgroup_to_polars(
-        self,
-        doc: Dict[str, Any],
-        itemgroup_oid: str,
-        *,
-        strict: bool = False,
-    ) -> Tuple[pl.DataFrame, pl.DataFrame]:
-        """
-        Convert one Dataset-JSON dataset (itemGroupData[OID]) into Polars DataFrame.
-
-        Returns: (data_df, findings_df)
-        """
-        findings: List[pl.DataFrame] = []
-
-        ds = self.get_itemgroup(doc, itemgroup_oid)
-        if ds is None:
-            return pl.DataFrame(), self.finding(
-                rule_id="DJ_100",
-                severity="CRIT",
-                field="itemGroupData",
-                message=f"ItemGroup '{itemgroup_oid}' not found in itemGroupData.",
-                evidence=";".join(self.list_itemgroups(doc)),
-            )
-
-        items = ds.get("items")
-        item_data = ds.get("itemData")
-
-        if not isinstance(items, list) or len(items) == 0:
-            findings.append(
-                self.finding(
-                    rule_id="DJ_101",
-                    severity="CRIT",
-                    field=f"{itemgroup_oid}.items",
-                    message="Dataset must include a non-empty 'items' array.",
-                )
-            )
-            if strict:
-                return pl.DataFrame(), self.concat_findings(findings)
-
-        if not isinstance(item_data, list):
-            findings.append(
-                self.finding(
-                    rule_id="DJ_102",
-                    severity="CRIT",
-                    field=f"{itemgroup_oid}.itemData",
-                    message="'itemData' must be an array of records.",
-                    evidence=str(type(item_data)),
-                )
-            )
-            if strict:
-                return pl.DataFrame(), self.concat_findings(findings)
-
-        # Build column names from items (prefer 'name', fallback to 'OID')
-        col_names: List[str] = []
-        for idx, it in enumerate(items or []):
-            if not isinstance(it, dict):
-                findings.append(
-                    self.finding(
-                        rule_id="DJ_103",
-                        severity="HIGH",
-                        field=f"{itemgroup_oid}.items[{idx}]",
-                        message="Each element of 'items' must be an object.",
-                        evidence=str(type(it)),
-                    )
-                )
-                continue
-            name = it.get("name") or it.get("OID") or f"COL_{idx}"
-            col_names.append(str(name))
-
-        if not col_names:
-            findings.append(
-                self.finding(
-                    rule_id="DJ_104",
-                    severity="CRIT",
-                    field=f"{itemgroup_oid}.items",
-                    message="Could not derive any column names from 'items'.",
-                )
-            )
-            return pl.DataFrame(), self.concat_findings(findings)
-
-        # Convert itemData: expected list of arrays aligned to items
-        rows: List[List[Any]] = []
-        if isinstance(item_data, list):
-            for r_idx, rec in enumerate(item_data):
-                if not isinstance(rec, list):
-                    findings.append(
-                        self.finding(
-                            rule_id="DJ_105",
-                            severity="HIGH",
-                            field=f"{itemgroup_oid}.itemData[{r_idx}]",
-                            message="Each itemData record should be an array of values.",
-                            row_index=r_idx,
-                            evidence=str(type(rec)),
-                        )
-                    )
-                    continue
-
-                if len(rec) != len(col_names):
-                    findings.append(
-                        self.finding(
-                            rule_id="DJ_106",
-                            severity="HIGH",
-                            field=f"{itemgroup_oid}.itemData[{r_idx}]",
-                            message="Record length does not match number of items.",
-                            row_index=r_idx,
-                            evidence=f"len(record)={len(rec)} len(items)={len(col_names)}",
-                        )
-                    )
-
-                fixed = (rec + [None] * len(col_names))[: len(col_names)]
-                rows.append(fixed)
-
-        df = pl.DataFrame(rows, schema=col_names) if rows else pl.DataFrame(schema=col_names)
-        return df, self.concat_findings(findings)
-
-    # ---------- Convenience ----------
-
-    def domain_to_polars(
-        self,
-        doc: Dict[str, Any],
-        domain: str,
-        *,
-        strict: bool = False,
-    ) -> Tuple[pl.DataFrame, pl.DataFrame, Optional[str]]:
-        """
-        Convenience: infer itemGroup OID for a domain and convert to Polars.
-
-        Returns: (df, findings, itemgroup_oid)
-        """
-        oid = self.infer_itemgroup_oid_for_domain(doc, domain)
-        if oid is None:
-            return pl.DataFrame(), self.finding(
-                rule_id="DJ_110",
-                severity="CRIT",
-                field="domain",
-                message=f"Could not infer itemGroup OID for domain '{domain}'.",
-                evidence=";".join(self.list_itemgroups(doc)),
-            ), None
-
-        df, f = self.itemgroup_to_polars(doc, oid, strict=strict)
-        return df, f, oid
+        return DatasetJsonValidationResult(
+            datasets=datasets,
+            findings=concat_findings(parts),
+        )
