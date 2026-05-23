@@ -1,6 +1,6 @@
 # Integris Clinical Platform
 
-> **Status: Active Development — v0.8 (targeting v1.0 release Q3 2026)**
+> **Status: Active Development — v0.8 (targeting v1.0 release mid Q4 2026)**
 
 A proprietary, cloud-native SaaS platform for clinical data validation and regulatory compliance, built for Contract Research Organizations (CROs) and pharmaceutical sponsors operating under FDA and EMA standards.
 
@@ -27,6 +27,8 @@ It addresses a documented gap in the US clinical research industry: the lack of 
 - **FDA 21 CFR Part 11 Audit Trail** — immutable, cryptographically hashed audit log of every action
 - **Multi-Tenant Architecture** — complete data isolation per CRO client
 - **Role-Based Access Control** — configurable user roles with multi-factor authentication
+- **AI-Powered Clinical Insights** — Claude-backed narrative report generation, anomaly explanation, natural-language querying of validation results, and CDISC rule-profile recommendations (Anthropic Claude API)
+- **EDC Direct Import** — connector abstraction layer for pulling CDISC Dataset-JSON v1.1 data directly from EDC systems (REDCap fully implemented; Medidata Rave and Veeva Vault stubbed for integration)
 
 ---
 
@@ -41,6 +43,8 @@ It addresses a documented gap in the US clinical research industry: the lack of 
 - **JWT RS256** + **TOTP MFA** — asymmetric-key authentication with RFC 6238 multi-factor
 - **bcrypt** (passlib) — password hashing (cost factor 12)
 - **pyotp** — TOTP token generation and verification
+- **Anthropic SDK** (`anthropic>=0.25.0`) — Claude API integration (`claude-sonnet-4-20250514`) for AI-powered clinical insights
+- **requests** + **httpx** — synchronous and async HTTP clients for EDC connector integrations
 
 ### Frontend
 - **Angular 21** — standalone components, signals, `inject()` pattern, `@if`/`@for` control flow
@@ -65,7 +69,7 @@ It addresses a documented gap in the US clinical research industry: the lack of 
 - **Makefile** — one-command developer workflow (`make up`, `make migrate`, `make test`)
 - **ruff** — linting and formatting
 - **mypy** — static type checking
-- **pytest** + **httpx** — 107 integration tests
+- **pytest** + **httpx** — 138 tests (107 integration + 31 unit)
 
 ---
 
@@ -117,7 +121,9 @@ integris/
 │   │   │   ├── studies.py            # Study CRUD and lifecycle
 │   │   │   ├── datasets.py           # File upload and metadata
 │   │   │   ├── validation.py         # Job submission and status
-│   │   │   └── findings.py           # Findings list, resolve, waive
+│   │   │   ├── findings.py           # Findings list, resolve, waive
+│   │   │   ├── ai.py                 # AI endpoints (report narrative, anomaly explain, NL query, rule suggest)
+│   │   │   └── edc.py                # EDC endpoints (connect, studies, import, status)
 │   │   ├── core/                     # Cross-cutting concerns
 │   │   │   ├── audit.py              # SQLAlchemy event listener → audit_log
 │   │   │   ├── security.py           # JWT signing, key generation
@@ -135,6 +141,16 @@ integris/
 │   │   │   └── tenant.py             # Multi-tenant organisation model
 │   │   ├── schemas/                  # Pydantic request/response schemas
 │   │   ├── services/                 # Business logic layer
+│   │   │   ├── ai/
+│   │   │   │   ├── claude_service.py # generate_report_narrative, explain_anomaly, nl_query, suggest_rule_profile
+│   │   │   │   └── README.md         # AI layer docs, endpoints, env vars, examples
+│   │   │   └── edc/
+│   │   │       ├── base.py           # EDCConnector ABC, EDCConnectionConfig, EDCSystemType
+│   │   │       ├── factory.py        # EDCConnectorFactory.create() — routes by system_type
+│   │   │       ├── redcap.py         # REDCap connector (auth + list_studies + pull_dataset implemented)
+│   │   │       ├── medidata_rave.py  # Medidata Rave connector (stubbed — TODO-EDC-003 through 008)
+│   │   │       ├── veeva_vault.py    # Veeva Vault connector (stubbed — TODO-EDC-011 through 015)
+│   │   │       └── README.md         # EDC layer docs, supported systems, add-connector guide
 │   │   └── workers/
 │   │       ├── celery_app.py         # Celery application instance
 │   │       └── tasks.py              # Validation pipeline task
@@ -143,13 +159,15 @@ integris/
 │   │       └── 001_initial.py        # Full schema (all tables, indexes, FKs)
 │   ├── scripts/
 │   │   └── generate_keys.py          # RSA-2048 key pair generation → .env
-│   ├── tests/                        # Integration test suite
+│   ├── tests/                        # Test suite (integration + unit)
 │   │   ├── conftest.py               # Fixtures, test DB engine, HTTP client
 │   │   ├── test_auth.py              # Auth flows, MFA, token refresh (62 tests)
 │   │   ├── test_studies.py           # Study CRUD, RBAC, data isolation
 │   │   ├── test_datasets.py          # File upload, metadata extraction
 │   │   ├── test_validation.py        # Validation engine, Celery tasks
-│   │   └── test_findings.py          # Findings, resolve/waive, bulk ops
+│   │   ├── test_findings.py          # Findings, resolve/waive, bulk ops
+│   │   ├── test_ai.py                # AI service unit tests + endpoint RBAC (14 tests)
+│   │   └── test_edc.py               # EDC factory, REDCap connector, endpoint RBAC (17 tests)
 │   ├── Dockerfile                    # Development container
 │   ├── requirements.txt              # Production dependencies
 │   └── requirements-dev.txt          # Test and development dependencies
@@ -265,6 +283,28 @@ Interactive docs available at `/docs` in development mode.
 | `GET` | `/findings/{id}` | Finding detail with evidence |
 | `PATCH` | `/findings/{id}/resolve` | Resolve or waive a finding |
 
+### AI (Claude API)
+
+Requires `ROLE_VALIDATOR` minimum. All calls invoke the Anthropic Claude API (`claude-sonnet-4-20250514`).
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/ai/report-narrative` | Generate plain-English narrative for a completed validation job |
+| `POST` | `/ai/explain-anomaly` | Clinical explanation of an Isolation Forest anomaly finding |
+| `POST` | `/ai/query` | Natural-language question over validation results for a study |
+| `POST` | `/ai/suggest-rules` | Recommend a CDISC validation rule profile from a dataset sample |
+
+### EDC Connectors
+
+Requires `ROLE_TENANT_ADMIN`. Supports REDCap (implemented), Medidata Rave, and Veeva Vault (stubbed).
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/edc/connect` | Configure and test an EDC connection for this tenant |
+| `GET` | `/edc/studies` | List studies available in the connected EDC system |
+| `POST` | `/edc/import/{study_id}` | Pull datasets from EDC and trigger CDISC validation automatically |
+| `GET` | `/edc/status` | EDC connection status for the current tenant |
+
 ### System
 
 | Method | Endpoint | Description |
@@ -311,7 +351,8 @@ The Integris Clinical Platform directly addresses US federal priorities in clini
 | Phase 3 | ✅ Complete | GCP Terraform infrastructure (11 modules), production Dockerfiles, Cloud Build CI/CD |
 | Phase 4 | ✅ Complete | Dependency packaging, INSTALL.md, requirements split |
 | Phase 5 | ✅ Complete | GitHub presentation — CONTRIBUTING, SECURITY, CHANGELOG, issue/PR templates |
-| **v1.0** | 🎯 Target Q3 2026 | Reports/audit API endpoints, production GCP deployment, customer onboarding |
+| Phase 6 | ✅ Complete | AI layer (Claude API) + EDC connector abstraction (REDCap, Medidata Rave, Veeva Vault) |
+| **v1.0** | 🎯 Target mid Q4 2026 | Reports/audit API endpoints, production GCP deployment, customer onboarding |
 
 ---
 
@@ -339,7 +380,7 @@ cd integris-clinical-platform
 # 2. Configure environment
 cp .env.example .env
 make keys               # generates RSA-2048 JWT key pair → .env
-# edit .env to set POSTGRES_PASSWORD and SECRET_KEY
+# edit .env to set POSTGRES_PASSWORD, SECRET_KEY, and ANTHROPIC_API_KEY
 
 # 3. Start all services (db, redis, elasticsearch, api, worker)
 make up                 # waits for images to build, ~2 min first run
@@ -364,7 +405,7 @@ cd integris-clinical-platform
 # 2. Configure environment
 Copy-Item .env.example .env
 python backend\scripts\generate_keys.py   # writes JWT keys to .env
-# edit .env to set POSTGRES_PASSWORD and SECRET_KEY
+# edit .env to set POSTGRES_PASSWORD, SECRET_KEY, and ANTHROPIC_API_KEY
 
 # 3. Start all services
 docker compose up -d --build
@@ -400,7 +441,7 @@ make logs            # Tail FastAPI logs
 make logs-all        # Tail all service logs
 make frontend        # Start Angular dev server with hot reload
 make frontend-build  # Production build → frontend/dist/
-make test            # Full integration test suite (107 tests)
+make test            # Full test suite (138 tests)
 make test-fast       # Run tests, stop on first failure (-x)
 make test-auth       # Auth tests only
 make test-validation # Validation pipeline tests only
@@ -427,14 +468,16 @@ cd backend && pytest tests/ --cov=app --cov-report=term-missing
 
 **Current test counts:**
 
-| Module | Tests |
-|---|---|
-| `test_auth.py` | 62 |
-| `test_studies.py` | — |
-| `test_datasets.py` | — |
-| `test_validation.py` | — |
-| `test_findings.py` | — |
-| **Total** | **107** |
+| Module | Tests | Type |
+|---|---|---|
+| `test_auth.py` | 62 | Integration |
+| `test_studies.py` | — | Integration |
+| `test_datasets.py` | — | Integration |
+| `test_validation.py` | — | Integration |
+| `test_findings.py` | — | Integration |
+| `test_ai.py` | 14 | Unit (mocked Anthropic client) |
+| `test_edc.py` | 17 | Unit (mocked HTTP) |
+| **Total** | **138** | |
 
 ---
 
