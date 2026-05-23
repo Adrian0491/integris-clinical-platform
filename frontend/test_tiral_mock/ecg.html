@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>ECG Assessment</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <main>
+            <div>
+                <header>
+                    <h1>ECG Assessment</h1>
+                </header>
+                <button id="saveBtn" class="save-btn" aria-label="Save" (onSave)="handleSave()">
+                    Save
+                </button>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="ecg_result">Was ECG Performed?:
+                            <select id="ECGRESULT" name="ECGRESULT">
+                                <option value="">(select one)</option>
+                                <option value="N">Yes</option>
+                                <option value="A">No</option>
+                            </select>
+                        </label>
+                        <label for="ecg_date">Date of ECG:<input id="ECGDATE" name="ECGDATE" type="date" required /></label>
+                    </fieldset>
+                </section>
+            </div>
+            <div></div>
+                <section>
+                    <fieldset>
+                        <legend>ECG Method:</legend>
+                        <label> <input id="ECGMETHOD_12LEAD" name="ECGMETHOD" type="radio" value="12LEAD" checked>12 Lead Standard</label>
+                        <legend>Position:</legend>
+                        <label for="ecg_position">Supine<input id="ECGPOSITION" name="ECGPOSITION" type="radio" /></label>
+                        <label for="ecg_position_standing">Standing<input id="ECGPOSITION_STANDING" name="ECGPOSITION_STANDING"
+                                type="radio" /></label>
+                        <label for="ecg_position_sitting">Sitting<input id="ECGPOSITION_SITTING" name="ECGPOSITION_SITTING"
+                                type="radio" /></label>
+                    </fieldset>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <label for="ecg_notes">ECG Reference Identifier/Accession Number<textarea id="ECGNOTES" name="ECGNOTES"></textarea></label>
+                    </fieldset>
+                </section>
+            </div>
+        </main>
+    </body>
+</html>

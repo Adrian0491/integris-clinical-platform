@@ -1,0 +1,6 @@
+.full-table { width: 100%; }
+.status-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 12px; font-size: .78rem; font-weight: 500;
+}
+.chip-icon { font-size: 14px; width: 14px; height: 14px; }

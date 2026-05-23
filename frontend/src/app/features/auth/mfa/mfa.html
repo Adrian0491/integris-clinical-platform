@@ -1,0 +1,42 @@
+<div class="login-wrapper">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <div class="login-logo">
+        <mat-icon>shield</mat-icon>
+        <span>CDTool</span>
+      </div>
+      <mat-card-title>Two-factor authentication</mat-card-title>
+      <mat-card-subtitle>Enter the 6-digit code from your authenticator app</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (errorMsg()) {
+        <div class="api-error">
+          <mat-icon>error_outline</mat-icon>{{ errorMsg() }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>6-digit code</mat-label>
+          <mat-icon matPrefix>pin</mat-icon>
+          <input matInput formControlName="totp_code" maxlength="6"
+                 inputmode="numeric" autocomplete="one-time-code" />
+          @if (form.controls.totp_code.invalid && form.controls.totp_code.touched) {
+            <mat-error>Enter the 6-digit code from your authenticator app</mat-error>
+          }
+        </mat-form-field>
+
+        <button mat-flat-button type="submit"
+                class="full-width submit-btn"
+                [disabled]="form.invalid || loading()">
+          @if (loading()) { <mat-spinner diameter="20" /> } @else { Verify }
+        </button>
+      </form>
+
+      <button mat-button class="full-width back-btn" (click)="back()">
+        ← Back to login
+      </button>
+    </mat-card-content>
+  </mat-card>
+</div>

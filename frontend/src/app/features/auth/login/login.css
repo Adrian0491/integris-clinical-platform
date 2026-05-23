@@ -1,0 +1,40 @@
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--mat-sys-primary-container) 0%, var(--mat-sys-surface) 100%);
+  padding: 16px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--mat-sys-primary);
+}
+
+.login-logo mat-icon { font-size: 2rem; width: 2rem; height: 2rem; }
+
+mat-card-content { padding-top: 16px !important; }
+
+.full-width { width: 100%; }
+
+.submit-btn {
+  margin-top: 8px;
+  height: 44px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+mat-form-field { margin-bottom: 4px; }

@@ -1,0 +1,17 @@
+.run-card { max-width: 680px; }
+.full-width { width: 100%; }
+.dataset-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.dataset-header h3 { margin: 0; }
+.dataset-list { display: flex; flex-direction: column; gap: 8px; }
+.dataset-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--mat-sys-outline-variant);
+}
+.dataset-item:hover { background: var(--mat-sys-surface-container-low); }
+.dataset-info { flex: 1; display: flex; flex-direction: column; }
+.filename { font-size: .82rem; color: var(--mat-sys-on-surface-variant); }
+.format-badge { font-size: .78rem; padding: 2px 8px; border-radius: 8px; background: var(--mat-sys-secondary-container); color: var(--mat-sys-on-secondary-container); }
+.actions { display: flex; justify-content: flex-end; align-items: center; gap: 12px; }
+.selection-info { color: var(--mat-sys-on-surface-variant); font-size: .9rem; }
+.hint { color: var(--mat-sys-on-surface-variant); font-style: italic; }

@@ -1,0 +1,14 @@
+.datasets-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .datasets-layout { grid-template-columns: 1fr; }
+}
+
+.upload-btn { width: 100%; margin-top: 12px; }
+.full-table  { width: 100%; }
+.full-width  { width: 100%; }

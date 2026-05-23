@@ -1,4 +1,4 @@
-TODO# ClinicalDataComplianceTool-Prototype  - TO BE UPDATED!!!
+# ClinicalDataComplianceTool-Prototype
 
 **Early-stage prototype for secure, real-time clinical data validation and compliance monitoring**  
 Initiated in January 2026 to showcase tangible progress toward building scalable Electronic Data Capture (EDC) infrastructure for clinical trials.
