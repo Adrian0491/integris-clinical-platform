@@ -5,7 +5,10 @@
       "PowerShell(Remove-Item -Force \"C:\\\\Users\\\\pirca\\\\Documents\\\\CDTool\\\\bk\\\\modules\\\\libs_test.py\" -Confirm:$false)",
       "Bash(node -e \"require\\('playwright'\\)\")",
       "Bash(echo \"exit: $?\")",
-      "Bash(node -e \"require\\('@playwright/test'\\)\")"
+      "Bash(node -e \"require\\('@playwright/test'\\)\")",
+      "Bash(dir /s /b \"C:\\\\Users\\\\pirca\\\\Documents\\\\CDTool\\\\backend\\\\*.py\")",
+      "Bash(python -c ' *)",
+      "Bash(python -m py_compile app/services/ai/claude_service.py app/services/edc/base.py app/services/edc/factory.py app/services/edc/redcap.py app/services/edc/medidata_rave.py app/services/edc/veeva_vault.py app/api/v1/ai.py app/api/v1/edc.py app/api/v1/router.py tests/test_ai.py tests/test_edc.py)"
     ]
   }
 }

@@ -66,6 +66,12 @@ class Settings(BaseSettings):
     # e.g. https://storage.googleapis.com/YOUR_BUCKET or https://www.integris-clinical.com
     LANDING_ORIGIN:  str       = "http://localhost:5500"  # VS Code Live Server default
 
+    # ── AI layer (Anthropic Claude) ───────────────────────────────────────────
+    # Set via environment variable ANTHROPIC_API_KEY or in .env.
+    # TODO-AI-007: Provision ANTHROPIC_API_KEY in GCP Secret Manager and inject
+    #              via Cloud Run secret volume / env-var binding in infra/terraform.
+    ANTHROPIC_API_KEY: str = ""
+
     # ── Feature flags ─────────────────────────────────────────────────────
     ENABLE_ES_INDEXING: bool = True   # set False to skip ES writes in tests
 
