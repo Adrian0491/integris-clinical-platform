@@ -62,6 +62,9 @@ class Settings(BaseSettings):
 
     # ── CORS ──────────────────────────────────────────────────────────────
     ALLOWED_ORIGINS: List[str] = ["http://localhost:4200", "http://localhost:3000"]
+    # Landing page origin — set to the GCS bucket URL or custom domain in prod.
+    # e.g. https://storage.googleapis.com/YOUR_BUCKET or https://www.integris-clinical.com
+    LANDING_ORIGIN:  str       = "http://localhost:5500"  # VS Code Live Server default
 
     # ── Feature flags ─────────────────────────────────────────────────────
     ENABLE_ES_INDEXING: bool = True   # set False to skip ES writes in tests

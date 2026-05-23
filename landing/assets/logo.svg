@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" role="img" aria-label="Integris Clinical Services LLC seal">
+  <defs>
+    <!-- Top arc: clockwise over the top of the circle, r=228 -->
+    <path id="topArc"    d="M 22,250 A 228,228 0 0,1 478,250"/>
+    <!-- Bottom arc: counterclockwise through the bottom, text reads left-to-right -->
+    <path id="bottomArc" d="M 22,250 A 228,228 0 0,0 478,250"/>
+
+    <!-- Reusable Greek-key hook arm (rotated 4× around shield circle centre 250,210) -->
+    <path id="gk-arm"
+      d="M 252,213 L 252,196 L 274,196 L 274,186 L 240,186 L 240,236"
+      fill="none" stroke="#4A7FC1" stroke-width="3.5"
+      stroke-linecap="square" stroke-linejoin="miter"/>
+  </defs>
+
+  <!-- ── Outer white background disc ── -->
+  <circle cx="250" cy="250" r="245" fill="#FFFFFF"/>
+
+  <!-- ── Ring band fill (navy) ── -->
+  <circle cx="250" cy="250" r="245" fill="#1A3C6E"/>
+  <circle cx="250" cy="250" r="219" fill="#FFFFFF"/>
+
+  <!-- ── Outer border rings ── -->
+  <circle cx="250" cy="250" r="245" fill="none" stroke="#1A3C6E" stroke-width="2"/>
+  <circle cx="250" cy="250" r="219" fill="none" stroke="#1A3C6E" stroke-width="1"/>
+
+  <!-- ── Top arc text: INTEGRIS CLINICAL SERVICES LLC ── -->
+  <text font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif"
+        font-size="19" font-weight="600" fill="#FFFFFF" letter-spacing="2.8">
+    <textPath href="#topArc" startOffset="50%" text-anchor="middle">
+      ◆ INTEGRIS CLINICAL SERVICES LLC ◆
+    </textPath>
+  </text>
+
+  <!-- ── Bottom arc text: SAN ANTONIO · TEXAS ── -->
+  <text font-family="'Cormorant Garamond', Georgia, 'Times New Roman', serif"
+        font-size="18" font-weight="600" fill="#FFFFFF" letter-spacing="2.5">
+    <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">
+      SAN ANTONIO  ·  TEXAS
+    </textPath>
+  </text>
+
+  <!-- ════════════════════════════════════════════════
+       SHIELD — navy body, white interior
+       ════════════════════════════════════════════════ -->
+  <!-- Shield outer (navy) -->
+  <path d="M 175,118 L 325,118 L 325,248
+           C 325,280 292,308 250,320
+           C 208,308 175,280 175,248 Z"
+        fill="#1A3C6E"/>
+
+  <!-- Thin inner border line -->
+  <path d="M 184,127 L 316,127 L 316,247
+           C 316,276 286,302 250,313
+           C 214,302 184,276 184,247 Z"
+        fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity="0.4"/>
+
+  <!-- Shield white interior -->
+  <path d="M 190,134 L 310,134 L 310,246
+           C 310,273 283,297 250,307
+           C 217,297 190,273 190,246 Z"
+        fill="#FFFFFF"/>
+
+  <!-- ════════════════════════════════════════════════
+       INNER EMBLEM — circle + Greek key in shield
+       ════════════════════════════════════════════════ -->
+  <!-- Circle border (navy) centered at 250,213 r=54 -->
+  <circle cx="250" cy="213" r="54" fill="none" stroke="#1A3C6E" stroke-width="2.5"/>
+  <!-- Thin inner circle (lighter) -->
+  <circle cx="250" cy="213" r="46" fill="none" stroke="#4A7FC1" stroke-width="1" opacity="0.5"/>
+
+  <!-- Greek key hooks — 4 arms rotated 0°/90°/180°/270° around (250,213) -->
+  <g fill="none" stroke="#1A3C6E" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
+    <!-- Arm 0° — upper-right spiral -->
+    <path d="M 252,215 L 252,198 L 274,198 L 274,188 L 240,188 L 240,238"/>
+    <!-- Arm 90° CCW — lower-right spiral  (rotate 90° around 250,213) -->
+    <path d="M 248,215 L 248,228 L 265,228 L 265,238 L 225,238 L 225,204"/>
+    <!-- Arm 180° — lower-left spiral -->
+    <path d="M 248,211 L 248,228 L 226,228 L 226,238 L 260,238 L 260,188"/>
+    <!-- Arm 270° — upper-left spiral -->
+    <path d="M 252,211 L 252,198 L 235,198 L 235,188 L 275,188 L 275,222"/>
+  </g>
+
+  <!-- Centre dot -->
+  <circle cx="250" cy="213" r="4" fill="#1A3C6E"/>
+
+  <!-- ── Shield base label band ── -->
+  <rect x="190" y="275" width="120" height="22" rx="0" fill="#1A3C6E"/>
+  <text x="250" y="291"
+        font-family="'Cormorant Garamond', Georgia, serif"
+        font-size="11" font-weight="700" fill="#FFFFFF"
+        text-anchor="middle" letter-spacing="2.5">INTEGRIS</text>
+</svg>

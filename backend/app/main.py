@@ -54,9 +54,13 @@ app = FastAPI(
 )
 
 # ── CORS ───────────────────────────────────────────────────────────────────
+_origins = list(settings.ALLOWED_ORIGINS)
+if settings.LANDING_ORIGIN:
+    _origins.append(settings.LANDING_ORIGIN)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
