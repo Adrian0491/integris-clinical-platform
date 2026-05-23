@@ -7,6 +7,47 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [Unreleased]
+
+**Phase 6: AI Layer + EDC Connector Abstraction**
+
+### Added
+- `backend/app/services/ai/claude_service.py` — Anthropic Claude API integration (`claude-sonnet-4-20250514`):
+  - `generate_report_narrative()` — plain-English validation summary for PDF compliance reports
+  - `explain_anomaly()` — clinical explanation of Isolation Forest anomaly findings
+  - `nl_query()` — natural-language query interface over validation results
+  - `suggest_rule_profile()` — CDISC rule-profile recommendation from a dataset sample
+  - `ClaudeServiceError` exception type; full system prompt establishing FDA 21 CFR Part 11 / CDISC / CRO context
+- `backend/app/api/v1/ai.py` — four AI endpoints under `/api/v1/ai/`:
+  - `POST /ai/report-narrative` — generate narrative for a completed validation job
+  - `POST /ai/explain-anomaly` — explain an ANOMALY-type finding
+  - `POST /ai/query` — answer natural-language questions about a study's validation results
+  - `POST /ai/suggest-rules` — recommend a CDISC validation rule profile; all endpoints require `ROLE_VALIDATOR` minimum
+- `backend/app/services/edc/base.py` — `EDCConnector` abstract base class, `EDCConnectionConfig` dataclass, `EDCSystemType` enum (MEDIDATA_RAVE, REDCAP, VEEVA_VAULT, ORACLE_CLINICAL_ONE, GENERIC_FHIR)
+- `backend/app/services/edc/factory.py` — `EDCConnectorFactory.create()` routing connectors by system type
+- `backend/app/services/edc/redcap.py` — `REDCapConnector`: fully implemented `authenticate()` (token validation), `list_studies()` (export_projects), and `pull_dataset()` (export_records + export_metadata with CDISC Dataset-JSON v1.1 output)
+- `backend/app/services/edc/medidata_rave.py` — `MedidataRaveConnector`: skeleton with OAuth2 stub and all methods stubbed (TODO-EDC-003 through TODO-EDC-008)
+- `backend/app/services/edc/veeva_vault.py` — `VeevaVaultConnector`: skeleton with session-auth stub and all methods stubbed (TODO-EDC-011 through TODO-EDC-015)
+- `backend/app/api/v1/edc.py` — four EDC endpoints under `/api/v1/edc/`:
+  - `POST /edc/connect` — configure and test an EDC connection (stored per-tenant)
+  - `GET /edc/studies` — list studies from the connected EDC system
+  - `POST /edc/import/{study_id}` — pull datasets from EDC, persist to storage, trigger CDISC validation job
+  - `GET /edc/status` — connection status for the current tenant; all endpoints require `ROLE_TENANT_ADMIN`
+- `backend/app/services/ai/README.md` — AI layer documentation: endpoints, environment variables, example request/response, outstanding TODOs
+- `backend/app/services/edc/README.md` — EDC layer documentation: supported systems table, add-a-connector guide, import workflow example, outstanding TODOs
+- `backend/tests/test_ai.py` — 14 unit tests for AI service (mocked Anthropic client) and endpoint RBAC
+- `backend/tests/test_edc.py` — 17 unit tests for EDC factory routing, REDCapConnector (mocked HTTP), Dataset-JSON output shape, and endpoint RBAC
+
+### Changed
+- `backend/requirements.txt` — added `anthropic>=0.25.0`, `requests>=2.31.0,<3.0.0`, `httpx>=0.27.0,<1.0.0`
+- `backend/app/config.py` — added `ANTHROPIC_API_KEY: str = ""` setting (TODO-AI-007 for GCP Secret Manager provisioning)
+- `backend/app/api/v1/router.py` — registered `ai.router` and `edc.router`
+- `README.md` — added AI and EDC to Core Features, Tech Stack, repo structure, API Reference, Project Status (Phase 6), and test count (107 → 138)
+- `.env.example` — added `ANTHROPIC_API_KEY` and `LANDING_ORIGIN` entries
+- `INSTALL.md` — added `ANTHROPIC_API_KEY` to `.env` checklist and environment variable reference table; updated test count
+
+---
+
 ## [0.8.0] — 2026-05-23
 
 **Phase 4: Production Hardening & Developer Experience**
@@ -178,6 +219,7 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+[Unreleased]: https://github.com/YOUR_ORG/integris/compare/v0.8.0...HEAD
 [0.8.0]: https://github.com/YOUR_ORG/integris/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/YOUR_ORG/integris/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/YOUR_ORG/integris/compare/v0.5.0...v0.6.0

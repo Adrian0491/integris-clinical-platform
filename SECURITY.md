@@ -50,13 +50,14 @@ We follow the **coordinated disclosure** model: we ask that reporters allow us r
 
 ### In scope
 
-- The Integris Clinical Platform API (`/api/v1/*`)
+- The Integris Clinical Platform API (`/api/v1/*`), including AI (`/ai/*`) and EDC connector (`/edc/*`) endpoints
 - The Angular frontend application
 - Authentication and session management (JWT, MFA, refresh tokens)
 - Role-based access control enforcement
 - Audit trail integrity
 - Electronic signature mechanism (21 CFR Part 11)
 - File upload handling and storage
+- EDC connector credential storage and transmission
 - GCP infrastructure configuration (Terraform)
 
 ### Out of scope
@@ -118,6 +119,8 @@ We follow the **coordinated disclosure** model: we ask that reporters allow us r
 - All production secrets stored in GCP Secret Manager
 - Secrets accessed via Cloud Run's native secret injection (`secretAccessor` IAM role)
 - Secret rotation: JWT keys rotated quarterly; Cloud Run picks up `latest` version without redeployment
+- `ANTHROPIC_API_KEY` stored in GCP Secret Manager (never in `.env` in production — see TODO-AI-007)
+- EDC connector credentials (API tokens, OAuth2 secrets) stored encrypted at rest via GCP Cloud KMS envelope encryption (see TODO-EDC-018)
 
 ---
 

@@ -107,6 +107,16 @@ Copy the output into `.env`:
 SECRET_KEY=<output>
 ```
 
+### 1d. Set the Anthropic API key (required for AI features)
+
+If you want to use the AI-powered endpoints (`/api/v1/ai/*`), add your Anthropic API key to `.env`:
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Leave it blank to run without AI features — all other platform functionality works independently.
+
 ### Final `.env` checklist
 
 | Variable | Status |
@@ -118,6 +128,7 @@ SECRET_KEY=<output>
 | `JWT_PUBLIC_KEY` | ✅ populated by `generate_keys.py` |
 | `SECRET_KEY` | ✅ set to 64-char hex value |
 | `STORAGE_BACKEND` | leave as `local` for development |
+| `ANTHROPIC_API_KEY` | optional — required for `/api/v1/ai/*` endpoints |
 
 ---
 
@@ -245,7 +256,7 @@ source .venv/bin/activate
 make test
 ```
 
-Expected output: **107 tests passing** across auth, studies, datasets, validation, findings, reports, and audit modules.
+Expected output: **138 tests passing** across auth, studies, datasets, validation, findings, reports, audit, AI service, and EDC connector modules.
 
 ### Run a specific test module
 
@@ -397,5 +408,7 @@ newgrp docker
 | `STORAGE_LOCAL_PATH` | If local | Path for uploaded files (default: `./storage`) |
 | `GCS_BUCKET_NAME` | If GCS | Google Cloud Storage bucket name |
 | `GCS_PROJECT_ID` | If GCS | Google Cloud project ID |
+| `ANTHROPIC_API_KEY` | No | Anthropic API key — required for `/api/v1/ai/*` endpoints |
+| `LANDING_ORIGIN` | No | Origin of the landing page for CORS (default: `http://localhost:5500`) |
 | `DEBUG` | No | `true` enables FastAPI debug mode |
 | `ENVIRONMENT` | No | `development` / `staging` / `production` |
