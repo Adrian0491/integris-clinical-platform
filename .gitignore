@@ -1,0 +1,71 @@
+# =============================================================================
+# CDTool — Git ignore rules
+# =============================================================================
+
+# ── Secrets & credentials ────────────────────────────────────────────────────
+# NEVER commit these files. Rotate credentials immediately if exposed.
+.env
+.env.local
+.env.*.local
+backend/.env
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ── Python ────────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+.hypothesis/
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# ── Node / Angular ────────────────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+
+# ── Storage / uploads ─────────────────────────────────────────────────────────
+storage/
+*.csv
+*.json
+# (un-comment below if you also want to exclude your mock data)
+# mock_data/
+
+# ── Editors & OS ──────────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+# Keep docker-compose.yml but exclude local override
+docker-compose.override.yml
+
+# ── Alembic ───────────────────────────────────────────────────────────────────
+# Keep migrations, but exclude local DB snapshots
+*.db
+
+# ── Claude Code ───────────────────────────────────────────────────────────────
+.claude/
