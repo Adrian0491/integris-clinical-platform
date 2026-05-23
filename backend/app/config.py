@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     )
 
     # ── Application ──────────────────────────────────────────────────────
-    APP_NAME:    str = "CDTool API"
-    APP_VERSION: str = "0.1.0"
+    APP_NAME:    str = "Integris Clinical Platform API"
+    APP_VERSION: str = "0.8.0"
     DEBUG:       bool = False
     ENVIRONMENT: str = "development"  # development | staging | production
 

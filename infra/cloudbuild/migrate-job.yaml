@@ -1,0 +1,23 @@
+# =============================================================================
+# Cloud Run Job — Alembic database migrations
+# Deploy once per environment; execute from the Cloud Build pipeline.
+#
+# Create with:
+#   gcloud run jobs create dev-migrate \
+#     --image=REGISTRY_URL/backend:latest \
+#     --region=us-central1 \
+#     --command=sh \
+#     --args="-c,cd /app/backend && alembic upgrade head" \
+#     --set-secrets=DATABASE_URL=integris-dev-DATABASE_URL:latest \
+#     --vpc-connector=integris-dev-connector \
+#     --service-account=integris-dev-run-sa@YOUR_GCP_PROJECT_ID.iam.gserviceaccount.com \
+#     --max-retries=1 \
+#     --task-timeout=300
+#
+# Then execute from Cloud Build with:
+#   gcloud run jobs execute dev-migrate --region=us-central1 --wait
+# =============================================================================
+
+# This file is documentation only — the job is created via gcloud CLI above.
+# Terraform support for Cloud Run Jobs (google_cloud_run_v2_job) can replace
+# this once the registry URL is known post first apply.

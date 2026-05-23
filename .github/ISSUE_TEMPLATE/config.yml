@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Security Vulnerability
+    url: mailto:security@integris-clinical.com
+    about: Report a security vulnerability privately. Do NOT open a public issue.
+  - name: Engineering Team
+    url: mailto:engineering@integris-clinical.com
+    about: Questions about contributing or architecture.

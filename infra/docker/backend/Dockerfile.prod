@@ -1,0 +1,64 @@
+# =============================================================================
+# Backend — multi-stage production image
+# Stage 1: install deps with build tools
+# Stage 2: lean runtime image, non-root user, gunicorn + uvicorn workers
+# =============================================================================
+
+# ── Stage 1: builder ──────────────────────────────────────────────────────────
+FROM python:3.12-slim AS builder
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpq-dev gcc build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+COPY backend/requirements.txt .
+
+# Install into a prefix so we can copy the whole tree cleanly
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# ── Stage 2: runtime ──────────────────────────────────────────────────────────
+FROM python:3.12-slim AS runtime
+
+# Runtime system deps only (no gcc / build-essential)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpq5 curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Non-root user for security
+RUN groupadd --gid 1001 appgroup && \
+    useradd  --uid 1001 --gid appgroup --no-create-home appuser
+
+# Copy installed Python packages from builder
+COPY --from=builder /install /usr/local
+
+WORKDIR /app
+
+# Copy application code only — no test files, no bk/, no mock_data/
+COPY backend/app          ./backend/app
+COPY backend/alembic      ./backend/alembic
+COPY backend/alembic.ini  ./backend/alembic.ini
+COPY backend/scripts      ./backend/scripts
+
+# PYTHONPATH so `from app.X` resolves from /app/backend
+ENV PYTHONPATH=/app:/app/backend \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Switch to non-root before running
+RUN chown -R appuser:appgroup /app
+USER appuser
+
+EXPOSE 8000
+
+# Gunicorn with uvicorn workers — 2 workers per CPU core (Cloud Run: 1-2 CPUs)
+CMD ["gunicorn", "app.main:app", \
+     "--worker-class", "uvicorn.workers.UvicornWorker", \
+     "--workers", "2", \
+     "--bind", "0.0.0.0:8000", \
+     "--timeout", "120", \
+     "--keepalive", "5", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "--log-level", "info"]

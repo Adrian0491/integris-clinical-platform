@@ -1,5 +1,5 @@
 """
-CDTool FastAPI application entry point.
+Integris Clinical Platform — FastAPI application entry point.
 
 Startup sequence
 ----------------

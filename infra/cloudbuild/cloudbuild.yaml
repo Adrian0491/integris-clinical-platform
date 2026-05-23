@@ -1,0 +1,173 @@
+# =============================================================================
+# Cloud Build — main branch CI/CD pipeline
+# Triggered on: push to main
+# Steps: test → build images → push to Artifact Registry → deploy to dev
+#
+# Substitutions (set in the trigger):
+#   _ENV             = dev | staging | prod
+#   _REGION          = us-central1
+#   _REGISTRY_URL    = us-central1-docker.pkg.dev/YOUR_GCP_PROJECT_ID/integris-images
+#   _API_SERVICE     = integris-dev-api
+#   _WORKER_SERVICE  = integris-dev-worker
+#   _FRONTEND_SERVICE= integris-dev-frontend
+# =============================================================================
+
+substitutions:
+  _ENV:              dev
+  _REGION:           us-central1
+  _REGISTRY_URL:     us-central1-docker.pkg.dev/YOUR_GCP_PROJECT_ID/integris-images
+  _API_SERVICE:      integris-dev-api
+  _WORKER_SERVICE:   integris-dev-worker
+  _FRONTEND_SERVICE: integris-dev-frontend
+
+steps:
+  # ── Step 1: Run backend tests ─────────────────────────────────────────────
+  - name: python:3.12-slim
+    id: test
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        apt-get update -qq && apt-get install -y -qq libpq-dev gcc
+        pip install --quiet -r backend/requirements.txt
+        export PYTHONPATH=/workspace:/workspace/backend
+        export ENABLE_ES_INDEXING=False
+        export STORAGE_BACKEND=local
+        export STORAGE_LOCAL_PATH=/tmp/test-storage
+        export JWT_PRIVATE_KEY="placeholder"
+        export JWT_PUBLIC_KEY="placeholder"
+        export SECRET_KEY="ci-test-secret"
+        cd backend && pytest tests/ -v --tb=short -x -q
+
+  # ── Step 2: Build backend image ────────────────────────────────────────────
+  - name: gcr.io/cloud-builders/docker
+    id: build-backend
+    waitFor: [test]
+    args:
+      - build
+      - --file=infra/docker/backend/Dockerfile.prod
+      - --tag=$_REGISTRY_URL/backend:$SHORT_SHA
+      - --tag=$_REGISTRY_URL/backend:latest
+      - --cache-from=$_REGISTRY_URL/backend:latest
+      - --build-arg=BUILDKIT_INLINE_CACHE=1
+      - .
+    env:
+      - DOCKER_BUILDKIT=1
+
+  # ── Step 3: Build worker image ─────────────────────────────────────────────
+  - name: gcr.io/cloud-builders/docker
+    id: build-worker
+    waitFor: [test]
+    args:
+      - build
+      - --file=infra/docker/worker/Dockerfile.prod
+      - --tag=$_REGISTRY_URL/worker:$SHORT_SHA
+      - --tag=$_REGISTRY_URL/worker:latest
+      - --cache-from=$_REGISTRY_URL/worker:latest
+      - --build-arg=BUILDKIT_INLINE_CACHE=1
+      - .
+    env:
+      - DOCKER_BUILDKIT=1
+
+  # ── Step 4: Build frontend image ───────────────────────────────────────────
+  - name: gcr.io/cloud-builders/docker
+    id: build-frontend
+    waitFor: [test]
+    args:
+      - build
+      - --file=infra/docker/frontend/Dockerfile.prod
+      - --tag=$_REGISTRY_URL/frontend:$SHORT_SHA
+      - --tag=$_REGISTRY_URL/frontend:latest
+      - --cache-from=$_REGISTRY_URL/frontend:latest
+      - --build-arg=BUILDKIT_INLINE_CACHE=1
+      - .
+    env:
+      - DOCKER_BUILDKIT=1
+
+  # ── Step 5: Push all images ────────────────────────────────────────────────
+  - name: gcr.io/cloud-builders/docker
+    id: push-backend
+    waitFor: [build-backend]
+    args: [push, --all-tags, $_REGISTRY_URL/backend]
+
+  - name: gcr.io/cloud-builders/docker
+    id: push-worker
+    waitFor: [build-worker]
+    args: [push, --all-tags, $_REGISTRY_URL/worker]
+
+  - name: gcr.io/cloud-builders/docker
+    id: push-frontend
+    waitFor: [build-frontend]
+    args: [push, --all-tags, $_REGISTRY_URL/frontend]
+
+  # ── Step 6: Run Alembic migrations ────────────────────────────────────────
+  # Uses Cloud Run Jobs to run the migration against the target environment's DB
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: migrate
+    waitFor: [push-backend]
+    entrypoint: gcloud
+    args:
+      - run
+      - jobs
+      - execute
+      - ${_ENV}-migrate
+      - --region=$_REGION
+      - --wait
+    # The migrate Cloud Run Job is defined separately (see ops/migrate-job.yaml)
+
+  # ── Step 7: Deploy API to Cloud Run ───────────────────────────────────────
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: deploy-api
+    waitFor: [migrate]
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update
+      - $_API_SERVICE
+      - --image=$_REGISTRY_URL/backend:$SHORT_SHA
+      - --region=$_REGION
+      - --platform=managed
+
+  # ── Step 8: Deploy worker ──────────────────────────────────────────────────
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: deploy-worker
+    waitFor: [migrate]
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update
+      - $_WORKER_SERVICE
+      - --image=$_REGISTRY_URL/worker:$SHORT_SHA
+      - --region=$_REGION
+      - --platform=managed
+
+  # ── Step 9: Deploy frontend ────────────────────────────────────────────────
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: deploy-frontend
+    waitFor: [push-frontend]
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update
+      - $_FRONTEND_SERVICE
+      - --image=$_REGISTRY_URL/frontend:$SHORT_SHA
+      - --region=$_REGION
+      - --platform=managed
+
+images:
+  - $_REGISTRY_URL/backend:$SHORT_SHA
+  - $_REGISTRY_URL/backend:latest
+  - $_REGISTRY_URL/worker:$SHORT_SHA
+  - $_REGISTRY_URL/worker:latest
+  - $_REGISTRY_URL/frontend:$SHORT_SHA
+  - $_REGISTRY_URL/frontend:latest
+
+timeout: 1800s   # 30 minutes
+
+options:
+  logging:     CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+  dynamic_substitutions: true

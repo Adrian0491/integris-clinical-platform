@@ -1,0 +1,60 @@
+# =============================================================================
+# Cloud Build — PR check pipeline
+# Triggered on: pull_request to main or staging
+# Steps: lint → backend tests → frontend build check
+# No images are pushed; no deployments happen.
+# =============================================================================
+
+steps:
+  # ── Step 1: Python lint (ruff) ────────────────────────────────────────────
+  - name: python:3.12-slim
+    id: lint
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        pip install --quiet ruff
+        ruff check backend/app backend/tests
+
+  # ── Step 2: Backend integration tests ─────────────────────────────────────
+  # Spins up a CloudSQL proxy sidecar and PostgreSQL for tests.
+  # For PR checks we use a minimal ephemeral Postgres via the test runner.
+  - name: python:3.12-slim
+    id: backend-tests
+    waitFor: [lint]
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        apt-get update -qq && apt-get install -y -qq libpq-dev gcc
+        pip install --quiet -r backend/requirements.txt
+        export PYTHONPATH=/workspace:/workspace/backend
+        export DATABASE_URL="postgresql://cdtool:cdtool_dev@localhost:5432/cdtool_test"
+        export ENABLE_ES_INDEXING=False
+        export STORAGE_BACKEND=local
+        export STORAGE_LOCAL_PATH=/tmp/test-storage
+        export JWT_PRIVATE_KEY="placeholder"
+        export JWT_PUBLIC_KEY="placeholder"
+        export SECRET_KEY="test-secret-key"
+        cd backend
+        pytest tests/ -v --tb=short -x
+    env:
+      - PYTHONPATH=/workspace:/workspace/backend
+
+  # ── Step 3: Frontend build check (no push) ────────────────────────────────
+  - name: node:22-alpine
+    id: frontend-build
+    waitFor: [lint]
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        cd frontend
+        npm ci --ignore-scripts
+        npx ng build --configuration production
+
+timeout: 1200s   # 20 minutes
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8

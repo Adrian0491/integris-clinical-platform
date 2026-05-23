@@ -43,11 +43,11 @@ frontend/dist/
 frontend/.angular/
 
 # ── Storage / uploads ─────────────────────────────────────────────────────────
+# The storage/ dir holds uploaded clinical data files — never commit those.
+# Do NOT use *.csv or *.json here: those patterns break package.json,
+# angular.json, tsconfig.json, and every other JSON config file.
 storage/
-*.csv
-*.json
-# (un-comment below if you also want to exclude your mock data)
-# mock_data/
+mock_data/
 
 # ── Editors & OS ──────────────────────────────────────────────────────────────
 .vscode/settings.json
@@ -69,3 +69,28 @@ docker-compose.override.yml
 
 # ── Claude Code ───────────────────────────────────────────────────────────────
 .claude/
+
+# ── Stale / legacy files (pre-rewrite) ────────────────────────────────────────
+# These are old files that predate the CDTool FastAPI/Angular rewrite.
+# They are excluded so they don't clutter the repo.
+bk/
+frontend/test_tiral_mock/
+frontend/ts/
+main_validators.py
+cleanup.sh
+__init__.py
+/package.json
+/requirements.txt
+
+# ── Terraform ─────────────────────────────────────────────────────────────────
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+# terraform.tfvars can contain db_password; pass via TF_VAR_db_password env var
+# .terraform.lock.hcl IS committed (provider version pinning)
+
+# ── VS Code local-only settings ───────────────────────────────────────────────
+# Commit extensions.json/launch.json/tasks.json, but not mcp.json
+frontend/.vscode/mcp.json
+.vscode/

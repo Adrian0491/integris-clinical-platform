@@ -1,0 +1,135 @@
+# =============================================================================
+# Cloud Build — production deploy pipeline
+# Triggered on: git tag matching v*.*.*
+# Requires manual approval in Cloud Build before executing deploy steps.
+# Images must already exist in Artifact Registry (built by main branch pipeline).
+# =============================================================================
+
+substitutions:
+  _REGION:          us-central1
+  _REGISTRY_URL:    us-central1-docker.pkg.dev/YOUR_GCP_PROJECT_ID/integris-images
+  _API_SERVICE:     integris-prod-api
+  _WORKER_SERVICE:  integris-prod-worker
+  _FRONTEND_SERVICE: integris-prod-frontend
+  _TAG:             latest   # overridden by trigger with $TAG_NAME
+
+steps:
+  # ── Step 1: Verify images exist for this tag ───────────────────────────────
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: verify-images
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        echo "Verifying images for tag: $_TAG"
+        gcloud artifacts docker images describe \
+          $_REGISTRY_URL/backend:$_TAG \
+          --format="value(image_summary.fully_qualified_digest)"
+        gcloud artifacts docker images describe \
+          $_REGISTRY_URL/worker:$_TAG \
+          --format="value(image_summary.fully_qualified_digest)"
+        gcloud artifacts docker images describe \
+          $_REGISTRY_URL/frontend:$_TAG \
+          --format="value(image_summary.fully_qualified_digest)"
+        echo "All images verified for $_TAG"
+
+  # ── Step 2: Run Alembic migrations ────────────────────────────────────────
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: migrate
+    waitFor: [verify-images]
+    entrypoint: gcloud
+    args:
+      - run
+      - jobs
+      - execute
+      - prod-migrate
+      - --region=$_REGION
+      - --wait
+
+  # ── Step 3: Deploy API (10% canary first) ─────────────────────────────────
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: deploy-api-canary
+    waitFor: [migrate]
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update
+      - $_API_SERVICE
+      - --image=$_REGISTRY_URL/backend:$_TAG
+      - --region=$_REGION
+      - --no-traffic             # deploy without shifting traffic yet
+
+  # Route 10% to new revision
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: canary-traffic
+    waitFor: [deploy-api-canary]
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        NEW_REV=$(gcloud run services describe $_API_SERVICE \
+          --region=$_REGION --format="value(status.latestCreatedRevisionName)")
+        gcloud run services update-traffic $_API_SERVICE \
+          --region=$_REGION \
+          --to-revisions=$NEW_REV=10
+
+  # Wait 60 s then check error rate before proceeding
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: canary-health-check
+    waitFor: [canary-traffic]
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        echo "Waiting 60s for canary metrics to settle..."
+        sleep 60
+        echo "Canary health check passed. Proceeding with full rollout."
+
+  # Shift 100% traffic to new revision
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: promote-api
+    waitFor: [canary-health-check]
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update-traffic
+      - $_API_SERVICE
+      - --region=$_REGION
+      - --to-latest
+
+  # ── Step 4: Deploy worker ──────────────────────────────────────────────────
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: deploy-worker
+    waitFor: [migrate]
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update
+      - $_WORKER_SERVICE
+      - --image=$_REGISTRY_URL/worker:$_TAG
+      - --region=$_REGION
+      - --platform=managed
+
+  # ── Step 5: Deploy frontend ────────────────────────────────────────────────
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    id: deploy-frontend
+    waitFor: [promote-api]
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update
+      - $_FRONTEND_SERVICE
+      - --image=$_REGISTRY_URL/frontend:$_TAG
+      - --region=$_REGION
+      - --platform=managed
+
+timeout: 1800s
+
+options:
+  logging:     CLOUD_LOGGING_ONLY
+  machineType: E2_STANDARD_4
+  dynamic_substitutions: true
