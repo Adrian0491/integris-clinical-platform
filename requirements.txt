@@ -1,0 +1,29 @@
+# =================================================
+# ClinicalDataComplianceTool — pinned dependencies
+# Last updated: 2026-05-22
+# =================================================
+
+# Core data processing
+pandas>=2.0,<3.0
+
+# Anomaly / outlier detection
+scikit-learn>=1.4,<2.0
+
+# Numeric support (required by scikit-learn and pandas)
+numpy>=1.26.0,<3.0
+
+# Optional — alternative anomaly detection library (not yet wired in)
+# pyod>=2.0.0
+
+# Future additions (uncomment when adding the respective feature)
+# fastapi>=0.115.0          # REST API layer
+# uvicorn[standard]>=0.30.0 # ASGI server
+# sqlalchemy>=2.0.0         # ORM
+# alembic>=1.13.0           # DB migrations
+# psycopg2-binary>=2.9.0    # PostgreSQL driver
+# elasticsearch>=8.15.0     # Elasticsearch client
+# celery[redis]>=5.4.0      # Async task queue
+# reportlab>=4.0.0          # PDF generation
+# loguru>=0.7.0             # Structured logging
+
+# Install: pip install -r requirements.txt

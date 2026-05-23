@@ -1,0 +1,8 @@
+.breadcrumb { display: flex; align-items: center; gap: 4px; }
+.sep { color: var(--mat-sys-on-surface-variant); }
+.header-actions { display: flex; gap: 8px; }
+.detail-list { display: grid; grid-template-columns: 140px 1fr; gap: 8px 16px; margin: 0; }
+dt { font-weight: 500; color: var(--mat-sys-on-surface-variant); }
+dd { margin: 0; }
+.status-pill { padding: 3px 10px; border-radius: 12px; font-size: 0.78rem; font-weight: 500; }
+.full-table { width: 100%; }

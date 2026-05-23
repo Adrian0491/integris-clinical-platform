@@ -1,143 +1,43 @@
-# Integris Clinical Platform
+# ClinicalDataComplianceTool-Prototype
 
-> **Status: Active Development — v0.8 (targeting v1.0 release Q3 2026)**
+**Early-stage prototype for secure, real-time clinical data validation and compliance monitoring**  
+Initiated in January 2026 to showcase tangible progress toward building scalable Electronic Data Capture (EDC) infrastructure for clinical trials.
 
-A proprietary, cloud-native SaaS platform for clinical data validation and regulatory compliance, built for Contract Research Organizations (CROs) and pharmaceutical sponsors operating under FDA and EMA standards.
+This Python-based proof-of-concept tool processes mock clinical trial datasets with rule-based validation and basic anomaly detection. It focuses on ensuring data integrity, identifying inconsistencies, and generating compliance-oriented reports — all designed with real-time processing in mind.
 
-Developed and maintained by **George Adrian Pircalaboiu**, Founder & CEO/CTO of **Integris Clinical Services LLC**, San Antonio, Texas.
+The prototype serves as the technical foundation for a future EDC system, enabling near-instant data validation and monitoring to support faster trial readiness, reduced burdens, and enhanced regulatory compliance.
 
----
+### Core Features
+- **Rule-based validation**: Enforces clinical rules (e.g., age ranges 18–100, required fields, logical date consistency, value bounds).
+- **Anomaly detection**: Uses Isolation Forest (scikit-learn) to identify statistical outliers in numeric variables.
+- **Compliance reporting**: Produces detailed, actionable summaries of flagged issues for review and audit purposes.
+- **Modular & extensible**: Clean design allows easy addition of custom rules or future integrations (e.g., CDISC Dataset-JSON support).
+- **Real-time readiness**: Built for eventual live data processing from a backend database.
 
-## Overview
+### Purpose & Strategic Alignment
+Developed in January 2026 as concrete evidence of advancement in my proposed endeavor: creating secure, compliant clinical data systems to accelerate trials.  
+The tool aligns with key U.S. national priorities in clinical research and data modernization, including:
+- FDA's exploration of modern exchange standards (Dataset-JSON, April 2025).
+- NIH Strategic Plan for Data Science 2025–2030 (interoperable biomedical ecosystems).
+- CDC Public Health Data Strategy milestones (real-time, secure clinical-public health data integration).
 
-The Integris Clinical Platform automates the validation of clinical trial datasets against CDISC/SDTM compliance standards, detects data anomalies in real time, generates FDA-ready compliance reports with electronic signatures, and maintains a complete audit trail in accordance with FDA 21 CFR Part 11 requirements.
+It is positioned as the core technology for a potential future U.S.-based Contract Research Organization (CRO) offering EDC and data compliance services — delivering faster, more equitable trials while creating economic value (e.g., job growth in health tech).
 
-It addresses a documented gap in the US clinical research industry: the lack of affordable, modern, cloud-native validation tooling accessible to small and mid-size CROs that cannot afford enterprise platforms like Medidata or Veeva.
-
----
-
-## Core Features
-
-- **CDISC/SDTM Rule-Based Validation** — automated validation across all major SDTM domains (DM, VS, AE, CM, LB, EG, MH, SV) with systematic rule IDs and severity classification (Critical, High, Medium, Low)
-- **Cross-Domain Validation** — detects inconsistencies spanning multiple clinical domains (e.g. adverse event dates preceding subject enrollment)
-- **CDISC Dataset-JSON v1.1 Support** — native parsing and validation of the FDA's emerging exchange standard
-- **Anomaly Detection** — Isolation Forest-based statistical outlier detection on SDTM numeric variables
-- **Real-Time Compliance Dashboard** — live aggregated compliance status across all active studies powered by Elasticsearch
-- **Automated PDF Compliance Reports** — structured, FDA-ready reports with electronic signature support
-- **FDA 21 CFR Part 11 Audit Trail** — immutable, cryptographically hashed audit log of every action
-- **Multi-Tenant Architecture** — complete data isolation per CRO client
-- **Role-Based Access Control** — configurable user roles with multi-factor authentication
-
----
-
-## Technology Stack
-
-### Backend
-- Python 3.10+ / FastAPI — async REST API
-- PostgreSQL — multi-tenant relational database (GCP Cloud SQL)
-- Elasticsearch — real-time findings aggregation and dashboard queries
-- Redis + Celery — async validation job processing
-- SQLAlchemy + Alembic — ORM and database migrations
-- JWT RS256 + TOTP MFA — authentication and authorization
-
-### Frontend
-- TypeScript / Angular 21
-- Angular Material — UI component library
-- Responsive web application with real-time WebSocket updates
-
-### Infrastructure
-- Google Cloud Platform (GCP)
-- Cloud Run — containerized auto-scaling deployment
-- Cloud Storage — encrypted dataset storage
-- Cloud KMS — encryption key management
-- Secret Manager — credentials management
-- Cloud Armor WAF — web application firewall
-- Docker + Docker Compose — local development
-
----
-
-## Architecture
-┌─────────────────────────────────────────┐
-│           Angular 21 SPA                │
-│     (Web Dashboard + Mobile future)     │
-└──────────────┬──────────────────────────┘
-│ HTTPS / WebSocket
-┌──────────────▼──────────────────────────┐
-│         FastAPI Backend                 │
-│    (REST API + Celery Workers)          │
-└──────────────┬──────────────────────────┘
-│
-┌──────────────▼──────────────────────────┐
-│         GCP Managed Services            │
-│  Cloud SQL │ Elasticsearch │ Redis      │
-│  Cloud Storage │ Cloud KMS              │
-└─────────────────────────────────────────┘
-
----
-
-## Regulatory Alignment
-
-The Integris Clinical Platform directly addresses US federal priorities in clinical data modernization:
-
-- **FDA Dataset-JSON v1.1** — native support for the FDA's emerging electronic study data submission standard (Federal Register, April 2025)
-- **NIH Strategic Plan for Data Science 2025–2030** — supports Goal 2 (Enhance Human Derived Data for Research) and Objective 2-2 (Adopt Health IT Standards for Research)
-- **CDC Public Health Data Strategy 2025–2026** — real-time, secure clinical data exchange aligned with CDC milestones
-- **FDA 21 CFR Part 11** — electronic records and signatures compliance built into the core platform
-- **21st Century Cures Act** — modern, interoperable digital health infrastructure
-
----
-
-## Project Status
-
-| Phase | Status | Description |
-|-------|--------|-------------|
-| Phase 0 | ✅ Complete | Prototype stabilization — 62 tests passing |
-| Phase 1 | ✅ Complete | FastAPI backend, auth, multi-tenancy, validation pipeline, 45 integration tests |
-| Phase 2 | ✅ Complete | Angular 21 frontend — all 9 modules |
-| Phase 3 | 🔄 In Progress | GCP deployment, Terraform, CI/CD, HIPAA controls |
-| Phase 4 | ⏳ Planned | Dependency packaging, installation scripts |
-| Phase 5 | ⏳ Planned | v1.0 release, full documentation |
-
----
-
-## Local Development
-
-### Prerequisites
-- Docker Desktop
-- Node.js 18+
+### Technology Stack
 - Python 3.10+
+- **Polars** – High-performance DataFrame library (faster and more memory-efficient than pandas for large clinical datasets)
+- scikit-learn – Anomaly detection (Isolation Forest)
+- numpy – Minimal numeric support
 
-### Quick Start (Linux/macOS)
-```bash
-git clone https://github.com/Adrian0491/integris-clinical-platform.git
-cd integris-clinical-platform
-cp backend/.env.example backend/.env
-make up
-make migrate
-make frontend
-```
+### Planned Future Extensions
+- **Backend database for real-time viewing**: **Elasticsearch** (Elastic Stack) as the distributed, real-time DB — enabling instant indexing of eCRF submissions and live querying for monitoring.
+- **Cloud deployment on Google Cloud Platform (GCP)** – Preferred due to prior expertise (e.g., Street View integration). Use **Elastic Cloud on GCP** (managed Elasticsearch service) for HIPAA-eligible, auto-scaling clusters.
+- **Integration with GCP Cloud Healthcare API** – Secure FHIR storage, real-time ingestion, de-identification, and audit trails for compliant clinical data handling.
+- **Data visualization** – **Kibana** (Elastic) for live dashboards and alerts; **Looker Studio** + **BigQuery** for advanced trial insights (e.g., anomaly trends, enrollment metrics).
+- **eCRF design & entry** – Simple web forms (via **AppSheet** or **Cloud Run**) with API endpoints for structured capture and interoperability.
 
-### Quick Start (Windows)
-```powershell
-git clone https://github.com/Adrian0491/integris-clinical-platform.git
-cd integris-clinical-platform
-copy backend\.env.example backend\.env
-.\scripts\run.ps1 up
-.\scripts\run.ps1 migrate
-.\scripts\run.ps1 frontend
-```
-
-Navigate to `http://localhost:4200`
-
----
-
-## About
-
-**Integris Clinical Services LLC**
-San Antonio, Texas, United States
-
-Building modern clinical data infrastructure for the US clinical research industry.
-
----
-
-*This repository contains proprietary software. All rights reserved.*
+### Quick Start
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Adrian0491/ClinicalDataComplianceTool-Prototype.git
+   cd ClinicalDataComplianceTool-Prototype

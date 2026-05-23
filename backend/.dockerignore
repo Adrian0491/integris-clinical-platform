@@ -1,0 +1,17 @@
+frontend/node_modules
+frontend/dist
+frontend/.angular
+.git
+**/__pycache__
+**/*.pyc
+**/*.pyo
+*.log
+logs/
+output/
+.env
+.env.local
+*.egg-info
+.pytest_cache
+.coverage
+htmlcov/
+storage/

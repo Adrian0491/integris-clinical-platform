@@ -1,0 +1,73 @@
+<div class="page-header">
+  <h1>Validation Jobs</h1>
+  <a mat-flat-button routerLink="/validation/run">
+    <mat-icon>play_arrow</mat-icon> Run Validation
+  </a>
+</div>
+
+@if (loading()) {
+  <div style="display:flex;justify-content:center;padding:64px"><mat-spinner /></div>
+} @else if (!jobs().length) {
+  <div class="empty-state">
+    <mat-icon>rule</mat-icon>
+    <p>No validation jobs yet.</p>
+    <a mat-flat-button routerLink="/validation/run">Run your first validation</a>
+  </div>
+} @else {
+  <table mat-table [dataSource]="jobs()" class="full-table">
+    <ng-container matColumnDef="created_at">
+      <th mat-header-cell *matHeaderCellDef>Submitted</th>
+      <td mat-cell *matCellDef="let j">{{ j.created_at | date:'short' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="study_id">
+      <th mat-header-cell *matHeaderCellDef>Study</th>
+      <td mat-cell *matCellDef="let j">{{ j.study_id | slice:0:8 }}…</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let j">
+        <span class="status-chip" [ngClass]="statusClass(j.status)">
+          <mat-icon class="chip-icon">{{ statusIcon(j.status) }}</mat-icon>
+          {{ j.status }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="rule_profile">
+      <th mat-header-cell *matHeaderCellDef>Profile</th>
+      <td mat-cell *matCellDef="let j">{{ j.rule_profile }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="datasets">
+      <th mat-header-cell *matHeaderCellDef>Datasets</th>
+      <td mat-cell *matCellDef="let j">{{ j.dataset_ids.length }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="duration">
+      <th mat-header-cell *matHeaderCellDef>Duration</th>
+      <td mat-cell *matCellDef="let j">{{ duration(j) }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let j" class="mat-column-actions">
+        @if (j.status === 'completed') {
+          <a mat-icon-button
+             [routerLink]="['/validation/findings']"
+             [queryParams]="{ job_id: j.id }"
+             matTooltip="View findings">
+            <mat-icon>bug_report</mat-icon>
+          </a>
+        }
+        @if (j.status === 'failed') {
+          <mat-icon class="sev-CRIT" matTooltip="{{ j.error_message }}">error</mat-icon>
+        }
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let r; columns: columns;"></tr>
+  </table>
+}

@@ -1,0 +1,118 @@
+@if (loading()) {
+  <div style="display:flex;justify-content:center;padding:64px"><mat-spinner /></div>
+} @else if (study(); as s) {
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a mat-button routerLink="/studies">
+        <mat-icon>arrow_back</mat-icon> Studies
+      </a>
+      <span class="sep">/</span>
+      <h1>{{ s.study_id }}</h1>
+    </div>
+    <div class="header-actions">
+      <a mat-stroked-button [routerLink]="['/datasets']" [queryParams]="{ study_id: s.id }">
+        <mat-icon>upload_file</mat-icon> Upload Dataset
+      </a>
+      <a mat-flat-button routerLink="/validation/run" [state]="{ study_id: s.id }">
+        <mat-icon>play_arrow</mat-icon> Run Validation
+      </a>
+    </div>
+  </div>
+
+  <!-- Study info -->
+  <div class="card-grid">
+    <mat-card>
+      <mat-card-header><mat-card-title>Study Details</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <dl class="detail-list">
+          <dt>Title</dt>        <dd>{{ s.title ?? '—' }}</dd>
+          <dt>Phase</dt>        <dd>{{ s.phase ?? '—' }}</dd>
+          <dt>Therapeutic Area</dt><dd>{{ s.therapeutic_area ?? '—' }}</dd>
+          <dt>Sponsor</dt>      <dd>{{ s.sponsor ?? '—' }}</dd>
+          <dt>Status</dt>       <dd><span [ngClass]="statusClass(s.status)" class="status-pill">{{ s.status }}</span></dd>
+          <dt>Created</dt>      <dd>{{ s.created_at | date:'medium' }}</dd>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Datasets ({{ datasets().length }})</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (!datasets().length) {
+          <div class="empty-state">
+            <mat-icon>folder_open</mat-icon>
+            <p>No datasets uploaded yet.</p>
+          </div>
+        } @else {
+          <table mat-table [dataSource]="datasets()" class="full-table">
+            <ng-container matColumnDef="filename">
+              <th mat-header-cell *matHeaderCellDef>File</th>
+              <td mat-cell *matCellDef="let d">{{ d.filename }}</td>
+            </ng-container>
+            <ng-container matColumnDef="domain">
+              <th mat-header-cell *matHeaderCellDef>Domain</th>
+              <td mat-cell *matCellDef="let d"><strong>{{ d.domain }}</strong></td>
+            </ng-container>
+            <ng-container matColumnDef="file_format">
+              <th mat-header-cell *matHeaderCellDef>Format</th>
+              <td mat-cell *matCellDef="let d">{{ d.file_format }}</td>
+            </ng-container>
+            <ng-container matColumnDef="row_count">
+              <th mat-header-cell *matHeaderCellDef>Rows</th>
+              <td mat-cell *matCellDef="let d">{{ d.row_count ?? '—' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="created_at">
+              <th mat-header-cell *matHeaderCellDef>Uploaded</th>
+              <td mat-cell *matCellDef="let d">{{ d.created_at | date:'shortDate' }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="datasetColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: datasetColumns;"></tr>
+          </table>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Recent jobs -->
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Validation Jobs</mat-card-title>
+      <span style="flex:1"></span>
+      <a mat-button [routerLink]="['/validation']" [queryParams]="{ study_id: s.id }">View all</a>
+    </mat-card-header>
+    <mat-card-content>
+      @if (!jobs().length) {
+        <div class="empty-state"><mat-icon>rule</mat-icon><p>No validation jobs yet.</p></div>
+      } @else {
+        <table mat-table [dataSource]="jobs().slice(0,5)" class="full-table">
+          <ng-container matColumnDef="created_at">
+            <th mat-header-cell *matHeaderCellDef>Submitted</th>
+            <td mat-cell *matCellDef="let j">{{ j.created_at | date:'short' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>Status</th>
+            <td mat-cell *matCellDef="let j">
+              <span [ngClass]="statusClass(j.status)" class="status-pill">{{ j.status }}</span>
+            </td>
+          </ng-container>
+          <ng-container matColumnDef="rule_profile">
+            <th mat-header-cell *matHeaderCellDef>Profile</th>
+            <td mat-cell *matCellDef="let j">{{ j.rule_profile }}</td>
+          </ng-container>
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let j">
+              <a mat-icon-button [routerLink]="['/validation/findings']" [queryParams]="{ job_id: j.id }">
+                <mat-icon>open_in_new</mat-icon>
+              </a>
+            </td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="jobColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: jobColumns;"></tr>
+        </table>
+      }
+    </mat-card-content>
+  </mat-card>
+}

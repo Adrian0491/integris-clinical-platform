@@ -1,0 +1,83 @@
+<div class="page-header">
+  <h1>Run Validation</h1>
+</div>
+
+<mat-card class="run-card">
+  <mat-card-content>
+    <form [formGroup]="form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Study *</mat-label>
+        <mat-select formControlName="study_id">
+          @for (s of studies(); track s.id) {
+            <mat-option [value]="s.id">{{ s.study_id }}{{ s.title ? ' — ' + s.title : '' }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Rule Profile</mat-label>
+        <mat-select formControlName="rule_profile">
+          @for (p of profiles; track p) {
+            <mat-option [value]="p">{{ p }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </form>
+
+    <mat-divider style="margin: 16px 0" />
+
+    <!-- Dataset selection -->
+    @if (form.value.study_id) {
+      <div class="dataset-header">
+        <h3>Select Datasets</h3>
+        @if (datasets().length) {
+          <button mat-stroked-button type="button" (click)="selectAll()">Select All</button>
+        }
+      </div>
+
+      @if (loadingDatasets()) {
+        <div style="display:flex;justify-content:center;padding:24px"><mat-spinner diameter="32" /></div>
+      } @else if (!datasets().length) {
+        <div class="empty-state">
+          <mat-icon>folder_open</mat-icon>
+          <p>No datasets uploaded for this study.</p>
+        </div>
+      } @else {
+        <div class="dataset-list">
+          @for (d of datasets(); track d.id) {
+            <div class="dataset-item" (click)="toggleDataset(d.id)">
+              <mat-checkbox [checked]="selectedDatasets().has(d.id)"
+                            (change)="toggleDataset(d.id)"
+                            (click)="$event.stopPropagation()">
+              </mat-checkbox>
+              <mat-icon>description</mat-icon>
+              <div class="dataset-info">
+                <strong>{{ d.domain }}</strong>
+                <span class="filename">{{ d.filename }}</span>
+              </div>
+              <span class="format-badge">{{ d.file_format }}</span>
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      <p class="hint">Select a study to see available datasets.</p>
+    }
+
+    <mat-divider style="margin: 16px 0" />
+
+    <div class="actions">
+      <span class="selection-info">
+        @if (selectedDatasets().size) {
+          {{ selectedDatasets().size }} dataset(s) selected
+        }
+      </span>
+      <button mat-flat-button
+              [disabled]="form.invalid || !selectedDatasets().size || submitting()"
+              (click)="submit()">
+        @if (submitting()) { <mat-spinner diameter="20" /> }
+        @else { <mat-icon>play_arrow</mat-icon> Run Validation }
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

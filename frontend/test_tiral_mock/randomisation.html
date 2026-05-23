@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Randomisation</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <main>
+            <div>
+                <header>
+                    <h1>
+                        Randomisation
+                    </h1>
+                </header>
+                <button id="saveBtn" class="save-btn" aria-label="Save" (onSave)="handleSave()">
+                    Save
+                </button>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <h4>Randomisation details:</h4>
+                        <label for="randomisationDate">Randomisation Date: <input id="RANDT" name="RANDT" type="date" required /></label>
+                        <label for="randomisationTime">Randomisation Time: <input id="RANDTM" name="RANDTM" type="time" required /></label>
+                            <label for="referrer">Was the patient randomised?
+                                <select id="referrer" name="referrer">
+                                    <option value="">(select one)</option>
+                                        <option value="1">Yes</option>
+                                        <option value="2">No</option>
+                                </select>
+                            </label>
+                    </fieldset>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <h4>Randomisation arm details:</h4>
+                        <label>
+                            <select id="referrer" name="referrer">
+                                <option value="">(select one)</option>
+                                <option value="1">Treatment</option>
+                                <option value="2">Control</option>
+                            </select>
+                        </label>
+                    </fieldset>
+                </section>
+            </div>
+            <div>
+                <section>
+                    <fieldset>
+                        <h4>Cohort details:</h4>
+                        <label>
+                            <select id="referrer" name="referrer">
+                                <option value="0">(select one)</option>
+                                <option value="1">Cohort 1</option>
+                                <option value="2">Cohort 2</option>
+                                <option value="3">Cohort 3</option>
+                                <option value="4">Cohort 4</option>
+                                <option value="5">Cohort 5</option>
+                                <option value="6">Cohort 6</option>
+                            </select>
+                    </fieldset>
+                </section>
+            </div>
+        </main>
+    </body>
+</html>

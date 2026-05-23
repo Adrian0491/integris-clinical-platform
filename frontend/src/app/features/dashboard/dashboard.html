@@ -1,0 +1,118 @@
+<div class="page-header">
+  <h1>Dashboard</h1>
+  <button mat-flat-button routerLink="/validation/run">
+    <mat-icon>play_arrow</mat-icon> Run Validation
+  </button>
+</div>
+
+@if (loading()) {
+  <div style="display:flex;justify-content:center;padding:64px">
+    <mat-spinner />
+  </div>
+} @else {
+  <!-- KPI cards -->
+  <div class="card-grid">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon style="font-size:40px;width:40px;height:40px;color:var(--mat-sys-primary)">science</mat-icon>
+        <div>
+          <div class="stat-number">{{ studies().length }}</div>
+          <div class="stat-label">Total Studies</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon style="font-size:40px;width:40px;height:40px;color:#2e7d32">check_circle</mat-icon>
+        <div>
+          <div class="stat-number">{{ activeStudies() }}</div>
+          <div class="stat-label">Active Studies</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon style="font-size:40px;width:40px;height:40px;color:#1565c0">rule</mat-icon>
+        <div>
+          <div class="stat-number">{{ completedJobs() }}</div>
+          <div class="stat-label">Completed Jobs</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <mat-icon style="font-size:40px;width:40px;height:40px;color:#c62828">error</mat-icon>
+        <div>
+          <div class="stat-number">{{ failedJobs() }}</div>
+          <div class="stat-label">Failed Jobs</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Studies overview -->
+  <div class="two-col">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Studies</mat-card-title>
+        <span class="header-spacer"></span>
+        <a mat-button routerLink="/studies">View all</a>
+      </mat-card-header>
+      <mat-card-content>
+        @if (!studies().length) {
+          <div class="empty-state">
+            <mat-icon>science</mat-icon>
+            <p>No studies yet.</p>
+            <a mat-stroked-button routerLink="/studies">Create a study</a>
+          </div>
+        } @else {
+          @for (s of studies().slice(0, 6); track s.id) {
+            <a class="study-row" [routerLink]="['/studies', s.id]">
+              <div>
+                <strong>{{ s.study_id }}</strong>
+                @if (s.title) { <span class="study-title">— {{ s.title }}</span> }
+              </div>
+              <span class="mat-body-small" [ngClass]="statusClass(s.status)">{{ s.status }}</span>
+            </a>
+            <mat-divider />
+          }
+        }
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Recent jobs -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Recent Validation Jobs</mat-card-title>
+        <span class="header-spacer"></span>
+        <a mat-button routerLink="/validation">View all</a>
+      </mat-card-header>
+      <mat-card-content>
+        @if (!recentJobs().length) {
+          <div class="empty-state">
+            <mat-icon>rule</mat-icon>
+            <p>No validation jobs yet.</p>
+            <a mat-stroked-button routerLink="/validation/run">Run validation</a>
+          </div>
+        } @else {
+          @for (j of recentJobs(); track j.id) {
+            <div class="job-row">
+              <mat-icon [ngClass]="'sev-' + (j.status === 'failed' ? 'CRIT' : 'LOW')">
+                {{ j.status === 'completed' ? 'check_circle' : j.status === 'failed' ? 'error' : 'pending' }}
+              </mat-icon>
+              <div class="job-info">
+                <span class="mat-body-small">{{ j.rule_profile }}</span>
+                <span class="mat-body-small date">{{ j.created_at | date:'short' }}</span>
+              </div>
+              <span [ngClass]="statusClass(j.status)" class="status-pill">{{ j.status }}</span>
+            </div>
+            <mat-divider />
+          }
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
+}

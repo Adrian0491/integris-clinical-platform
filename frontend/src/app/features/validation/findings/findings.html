@@ -1,0 +1,157 @@
+<div class="page-header">
+  <h1>Findings</h1>
+</div>
+
+<!-- Filter bar -->
+<form [formGroup]="filters" class="filter-bar" (ngSubmit)="applyFilters()">
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>Domain</mat-label>
+    <mat-select formControlName="domain">
+      <mat-option value="">All</mat-option>
+      @for (d of domains; track d) {
+        <mat-option [value]="d">{{ d }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>Severity</mat-label>
+    <mat-select formControlName="severity">
+      <mat-option value="">All</mat-option>
+      @for (s of severities; track s) {
+        <mat-option [value]="s">{{ s }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>Status</mat-label>
+    <mat-select formControlName="status">
+      <mat-option value="">All</mat-option>
+      @for (s of statuses; track s) {
+        <mat-option [value]="s">{{ s }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-field">
+    <mat-label>USUBJID</mat-label>
+    <input matInput formControlName="usubjid" placeholder="Subject ID" />
+  </mat-form-field>
+
+  <div class="filter-actions">
+    <button mat-flat-button type="submit">
+      <mat-icon>search</mat-icon> Filter
+    </button>
+    <button mat-stroked-button type="button" (click)="clearFilters()">
+      <mat-icon>clear</mat-icon> Clear
+    </button>
+  </div>
+</form>
+
+@if (loading()) {
+  <div style="display:flex;justify-content:center;padding:64px">
+    <mat-spinner />
+  </div>
+} @else if (!findings().length) {
+  <div class="empty-state">
+    <mat-icon>check_circle</mat-icon>
+    <p>No findings match the current filters.</p>
+  </div>
+} @else {
+  <div class="table-wrapper">
+    <table mat-table [dataSource]="findings()" class="full-table">
+
+      <!-- Severity -->
+      <ng-container matColumnDef="severity">
+        <th mat-header-cell *matHeaderCellDef>Severity</th>
+        <td mat-cell *matCellDef="let f">
+          <span class="sev-badge" [ngClass]="sevClass(f.severity)">
+            <mat-icon class="sev-icon">{{ sevIcon(f.severity) }}</mat-icon>
+            {{ f.severity }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Rule ID -->
+      <ng-container matColumnDef="rule_id">
+        <th mat-header-cell *matHeaderCellDef>Rule</th>
+        <td mat-cell *matCellDef="let f">
+          <code class="rule-code">{{ f.rule_id }}</code>
+        </td>
+      </ng-container>
+
+      <!-- Domain -->
+      <ng-container matColumnDef="domain">
+        <th mat-header-cell *matHeaderCellDef>Domain</th>
+        <td mat-cell *matCellDef="let f">{{ f.domain }}</td>
+      </ng-container>
+
+      <!-- Field -->
+      <ng-container matColumnDef="field">
+        <th mat-header-cell *matHeaderCellDef>Field</th>
+        <td mat-cell *matCellDef="let f">
+          <code>{{ f.field }}</code>
+        </td>
+      </ng-container>
+
+      <!-- USUBJID -->
+      <ng-container matColumnDef="usubjid">
+        <th mat-header-cell *matHeaderCellDef>USUBJID</th>
+        <td mat-cell *matCellDef="let f">{{ f.usubjid ?? '—' }}</td>
+      </ng-container>
+
+      <!-- Row Index -->
+      <ng-container matColumnDef="row_index">
+        <th mat-header-cell *matHeaderCellDef>Row</th>
+        <td mat-cell *matCellDef="let f" class="row-num">{{ f.row_index }}</td>
+      </ng-container>
+
+      <!-- Status -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <td mat-cell *matCellDef="let f">
+          <span class="status-chip" [ngClass]="statusClass(f.status)">
+            {{ f.status }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Actions -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let f" class="mat-column-actions">
+          <button mat-icon-button
+                  [matTooltip]="f.message"
+                  matTooltipClass="finding-tooltip">
+            <mat-icon>info_outline</mat-icon>
+          </button>
+          @if (auth.hasRole('validator', 'tenant_admin') && f.status === 'open') {
+            <button mat-icon-button
+                    matTooltip="Resolve / Waive"
+                    (click)="openResolve(f)">
+              <mat-icon>task_alt</mat-icon>
+            </button>
+          }
+          @if (f.status !== 'open') {
+            <mat-icon class="resolved-icon" [matTooltip]="f.resolution_note ?? ''">
+              {{ f.status === 'waived' ? 'block' : 'check_circle' }}
+            </mat-icon>
+          }
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: columns;" class="finding-row"></tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    [length]="10000"
+    [pageSize]="pageSize()"
+    [pageIndex]="pageIndex()"
+    [pageSizeOptions]="[25, 50, 100]"
+    (page)="onPage($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+}

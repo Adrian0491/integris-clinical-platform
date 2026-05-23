@@ -1,0 +1,70 @@
+<h2 mat-dialog-title>Resolve / Waive Finding</h2>
+
+<mat-dialog-content>
+  <!-- Finding summary -->
+  <div class="finding-summary">
+    <div class="finding-badge-row">
+      <span class="sev-chip" [ngClass]="sevClass()">
+        <mat-icon class="sev-icon">{{ sevIcon() }}</mat-icon>
+        {{ finding.severity }}
+      </span>
+      <code class="rule-code">{{ finding.rule_id }}</code>
+      <span class="domain-badge">{{ finding.domain }}</span>
+    </div>
+    <p class="finding-message">{{ finding.message }}</p>
+    @if (finding.evidence) {
+      <pre class="evidence">{{ finding.evidence }}</pre>
+    }
+  </div>
+
+  <mat-divider style="margin: 16px 0" />
+
+  <form [formGroup]="form" id="resolveForm" (ngSubmit)="save()">
+    <!-- Status selection -->
+    <label class="radio-label">Action</label>
+    <mat-radio-group formControlName="status" class="status-radio-group">
+      <mat-radio-button value="resolved">
+        <div class="radio-content">
+          <mat-icon class="radio-icon resolved-icon">check_circle</mat-icon>
+          <div>
+            <strong>Resolve</strong>
+            <div class="radio-desc">Issue has been corrected in the source data.</div>
+          </div>
+        </div>
+      </mat-radio-button>
+      <mat-radio-button value="waived">
+        <div class="radio-content">
+          <mat-icon class="radio-icon waived-icon">block</mat-icon>
+          <div>
+            <strong>Waive</strong>
+            <div class="radio-desc">Finding is acknowledged and accepted as-is.</div>
+          </div>
+        </div>
+      </mat-radio-button>
+    </mat-radio-group>
+
+    <!-- Resolution note -->
+    <mat-form-field appearance="outline" class="full-width" style="margin-top:16px">
+      <mat-label>Resolution note</mat-label>
+      <textarea matInput
+                formControlName="resolution_note"
+                rows="3"
+                placeholder="Describe why this finding is resolved or waived…"></textarea>
+      <mat-hint align="end">{{ form.controls.resolution_note.value.length }}/1000</mat-hint>
+      @if (form.controls.resolution_note.hasError('maxlength')) {
+        <mat-error>Note must be 1000 characters or fewer.</mat-error>
+      }
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button [mat-dialog-close]="false" [disabled]="saving()">Cancel</button>
+  <button mat-flat-button
+          form="resolveForm"
+          type="submit"
+          [disabled]="saving() || form.invalid">
+    @if (saving()) { <mat-spinner diameter="18" /> }
+    @else { Save }
+  </button>
+</mat-dialog-actions>

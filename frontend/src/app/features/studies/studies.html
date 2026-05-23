@@ -1,0 +1,70 @@
+<div class="page-header">
+  <h1>Studies</h1>
+  @if (auth.hasRole('validator', 'tenant_admin')) {
+    <button mat-flat-button (click)="openCreate()">
+      <mat-icon>add</mat-icon> New Study
+    </button>
+  }
+</div>
+
+@if (loading()) {
+  <div style="display:flex;justify-content:center;padding:64px"><mat-spinner /></div>
+} @else if (!studies().length) {
+  <div class="empty-state">
+    <mat-icon>science</mat-icon>
+    <p>No studies found. Create your first study to get started.</p>
+    @if (auth.hasRole('validator', 'tenant_admin')) {
+      <button mat-flat-button (click)="openCreate()">Create Study</button>
+    }
+  </div>
+} @else {
+  <table mat-table [dataSource]="studies()" class="full-table">
+    <ng-container matColumnDef="study_id">
+      <th mat-header-cell *matHeaderCellDef>Study ID</th>
+      <td mat-cell *matCellDef="let s">
+        <a [routerLink]="['/studies', s.id]" class="link-cell">{{ s.study_id }}</a>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="title">
+      <th mat-header-cell *matHeaderCellDef>Title</th>
+      <td mat-cell *matCellDef="let s">{{ s.title ?? '—' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="phase">
+      <th mat-header-cell *matHeaderCellDef>Phase</th>
+      <td mat-cell *matCellDef="let s">{{ s.phase ?? '—' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Status</th>
+      <td mat-cell *matCellDef="let s">
+        <span class="status-chip" [ngClass]="statusClass(s.status)">{{ s.status }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="created_at">
+      <th mat-header-cell *matHeaderCellDef>Created</th>
+      <td mat-cell *matCellDef="let s">{{ s.created_at | date:'mediumDate' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let s" class="mat-column-actions">
+        @if (auth.hasRole('validator', 'tenant_admin')) {
+          <button mat-icon-button (click)="openEdit(s)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+        }
+        @if (auth.hasRole('tenant_admin') && s.status !== 'archived') {
+          <button mat-icon-button (click)="archive(s)" matTooltip="Archive" color="warn">
+            <mat-icon>archive</mat-icon>
+          </button>
+        }
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+    <tr mat-row *matRowDef="let row; columns: columns;" class="clickable-row"></tr>
+  </table>
+}

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Remove-Item -Force \"C:\\\\Users\\\\pirca\\\\Documents\\\\CDTool\\\\bk\\\\modules\\\\libs.py\" -Confirm:$false)",
+      "PowerShell(Remove-Item -Force \"C:\\\\Users\\\\pirca\\\\Documents\\\\CDTool\\\\bk\\\\modules\\\\libs_test.py\" -Confirm:$false)"
+    ]
+  }
+}
