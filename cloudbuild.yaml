@@ -9,6 +9,9 @@ steps:
       - 'landing/.'
       - 'gs://integris-clinical-landing'
 
+options:
+  logging: CLOUD_LOGGING_ONLY
+
   # Future: Deploy backend to Cloud Run (we'll add this later)
   # - name: 'gcr.io/cloud-builders/docker'
   #   id: 'build-backend'
