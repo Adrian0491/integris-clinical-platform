@@ -1,5 +1,4 @@
 steps:
-  # Deploy landing page
   - name: 'gcr.io/cloud-builders/gsutil'
     id: 'deploy-landing'
     args:
@@ -8,6 +7,15 @@ steps:
       - '-r'
       - 'landing/.'
       - 'gs://integris-clinical-landing'
+  
+  - name: 'gcr.io/cloud-builders/gsutil'
+    id: 'set-cache-control'
+    args:
+      - '-m'
+      - 'setmeta'
+      - '-h'
+      - 'Cache-Control:no-cache, no-store'
+      - 'gs://integris-clinical-landing/index.html'
 
 options:
   logging: CLOUD_LOGGING_ONLY
