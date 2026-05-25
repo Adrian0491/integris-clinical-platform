@@ -1,0 +1,15 @@
+steps:
+  # Deploy landing page
+  - name: 'gcr.io/cloud-builders/gsutil'
+    id: 'deploy-landing'
+    args:
+      - '-m'
+      - 'cp'
+      - '-r'
+      - 'landing/.'
+      - 'gs://integris-clinical-landing'
+
+  # Future: Deploy backend to Cloud Run (we'll add this later)
+  # - name: 'gcr.io/cloud-builders/docker'
+  #   id: 'build-backend'
+  #   ...
