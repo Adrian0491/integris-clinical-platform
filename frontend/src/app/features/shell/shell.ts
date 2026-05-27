@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { TitleCasePipe } from '@angular/common';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
@@ -22,7 +23,7 @@ interface NavItem {
 @Component({
   selector: 'app-shell',
   imports: [
-    RouterOutlet, RouterLink, RouterLinkActive,
+    RouterOutlet, RouterLink, RouterLinkActive, TitleCasePipe,
     MatSidenavModule, MatToolbarModule, MatListModule,
     MatIconModule, MatButtonModule, MatMenuModule, MatDividerModule,
   ],

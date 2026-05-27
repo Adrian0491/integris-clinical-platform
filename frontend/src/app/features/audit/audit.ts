@@ -11,14 +11,14 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe, NgClass } from '@angular/common';
 import { AuditService } from '../../core/services/audit.service';
 import { AuditLog } from '../../core/models';
 
 @Component({
   selector: 'app-audit',
   imports: [
-    ReactiveFormsModule, DatePipe,
+    ReactiveFormsModule, DatePipe, SlicePipe, NgClass,
     MatTableModule, MatButtonModule, MatIconModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatDatepickerModule,

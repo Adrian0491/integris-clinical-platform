@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ReportsService } from '../../../core/services/reports.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { ValidationJob } from '../../../core/models';
+import { SlicePipe } from '@angular/common';
 
 export interface GenerateReportDialogData {
   jobs: ValidationJob[];
@@ -17,7 +18,7 @@ export interface GenerateReportDialogData {
 @Component({
   selector: 'app-generate-report-dialog',
   imports: [
-    ReactiveFormsModule,
+    ReactiveFormsModule, SlicePipe,
     MatDialogModule, MatButtonModule,
     MatFormFieldModule, MatInputModule,
     MatSelectModule, MatProgressSpinnerModule,

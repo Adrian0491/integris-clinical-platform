@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DatePipe, NgClass } from '@angular/common';
+import { DatePipe, NgClass, SlicePipe } from '@angular/common';
 import { interval, Subscription } from 'rxjs';
 import { ValidationService } from '../../../core/services/validation.service';
 import { ValidationJob } from '../../../core/models';
@@ -14,7 +14,7 @@ import { ValidationJob } from '../../../core/models';
 @Component({
   selector: 'app-jobs',
   imports: [
-    RouterLink, DatePipe, NgClass,
+    RouterLink, DatePipe, NgClass, SlicePipe,
     MatTableModule, MatButtonModule, MatIconModule,
     MatProgressSpinnerModule, MatChipsModule, MatTooltipModule,
   ],

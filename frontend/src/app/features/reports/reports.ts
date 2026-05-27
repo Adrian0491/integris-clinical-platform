@@ -12,7 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { DatePipe, NgClass } from '@angular/common';
+import { DatePipe, NgClass, SlicePipe } from '@angular/common';
 import { ReportsService } from '../../core/services/reports.service';
 import { ValidationService } from '../../core/services/validation.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -23,7 +23,7 @@ import { GenerateReportDialogComponent } from './generate-report-dialog/generate
 @Component({
   selector: 'app-reports',
   imports: [
-    ReactiveFormsModule, DatePipe, NgClass,
+    ReactiveFormsModule, DatePipe, NgClass, SlicePipe,
     MatTableModule, MatButtonModule, MatIconModule,
     MatFormFieldModule, MatInputModule, MatSelectModule,
     MatCardModule, MatProgressSpinnerModule,

@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { NgClass } from '@angular/common';
 import { ValidationService } from '../../../core/services/validation.service';
@@ -20,7 +21,7 @@ export interface ResolveDialogData {
   selector: 'app-resolve-dialog',
   imports: [
     ReactiveFormsModule, NgClass,
-    MatDialogModule, MatButtonModule,
+    MatDialogModule, MatButtonModule, MatDividerModule,
     MatFormFieldModule, MatInputModule,
     MatRadioModule, MatProgressSpinnerModule,
     MatIconModule,
