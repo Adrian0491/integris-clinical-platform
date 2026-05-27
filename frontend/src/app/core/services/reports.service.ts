@@ -32,4 +32,8 @@ export class ReportsService extends ApiService {
   getDownloadUrl(id: string): string {
     return `/api/v1/reports/${id}/download`;
   }
+
+  downloadBlob(id: string): Observable<Blob> {
+    return this.http.get(`${this.base}/reports/${id}/download`, { responseType: 'blob' });
+  }
 }

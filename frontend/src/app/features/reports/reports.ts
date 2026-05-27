@@ -90,7 +90,14 @@ export class ReportsComponent implements OnInit {
   }
 
   download(report: ComplianceReport): void {
-    window.open(this.svc.getDownloadUrl(report.id), '_blank');
+    this.svc.downloadBlob(report.id).subscribe(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report_${report.id}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
   }
 
   signedLabel(r: ComplianceReport): string {

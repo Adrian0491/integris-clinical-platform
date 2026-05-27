@@ -274,7 +274,7 @@ def download_report(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_viewer),
 ):
-    """Download the report PDF."""
+    """Download the report PDF via signed URL."""
     report = db.query(ComplianceReport).filter(
         ComplianceReport.id == report_id,
         ComplianceReport.tenant_id == current_user.tenant_id,
@@ -285,11 +285,26 @@ def download_report(
         raise HTTPException(status_code=404, detail="Report file not yet generated.")
 
     from app.storage.backends import get_storage
-    storage = get_storage()
-    pdf_bytes = storage.read(report.storage_uri)
+    from fastapi.responses import RedirectResponse
+    import datetime
 
-    return StreamingResponse(
-        io.BytesIO(pdf_bytes),
-        media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename=report_{report_id}.pdf"},
-    )
+    storage = get_storage()
+
+    # Try GCS signed URL first
+    try:
+        parts = report.storage_uri.replace("gs://", "").split("/", 1)
+        blob = storage._bucket.blob(parts[1])
+        signed_url = blob.generate_signed_url(
+            expiration=datetime.timedelta(minutes=15),
+            method="GET",
+            version="v4",
+        )
+        return RedirectResponse(url=signed_url)
+    except Exception:
+        # Fallback: stream the file
+        pdf_bytes = storage.read(report.storage_uri)
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename=report_{report_id}.pdf"},
+        )
