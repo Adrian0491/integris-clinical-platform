@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" role="img" aria-label="Integris Clinical Services icon">
+  <!-- Navy background circle -->
+  <circle cx="250" cy="250" r="245" fill="#1A3C6E"/>
+  <circle cx="250" cy="250" r="245" fill="none" stroke="#FFFFFF" stroke-width="8"/>
+  <circle cx="250" cy="250" r="228" fill="none" stroke="#FFFFFF" stroke-width="1.5" opacity="0.35"/>
+
+  <!-- ── Shield (white body, navy interior) ── -->
+  <path d="M 145,115 L 355,115 L 355,268
+           C 355,312 308,348 250,365
+           C 192,348 145,312 145,268 Z"
+        fill="#FFFFFF"/>
+
+  <!-- Shield inner navy fill -->
+  <path d="M 158,128 L 342,128 L 342,266
+           C 342,306 299,339 250,354
+           C 201,339 158,306 158,266 Z"
+        fill="#1A3C6E"/>
+
+  <!-- ── Greek key circle element ── -->
+  <circle cx="250" cy="228" r="72" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+  <circle cx="250" cy="228" r="60" fill="none" stroke="#4A7FC1" stroke-width="1.5" opacity="0.6"/>
+
+  <!-- Greek key arms — 4-fold symmetry, stroked in white -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="square" stroke-linejoin="miter">
+    <!-- Arm 0° (upper-right) -->
+    <path d="M 254,231 L 254,210 L 282,210 L 282,197 L 240,197 L 240,259"/>
+    <!-- Arm 90° (lower-right) -->
+    <path d="M 247,231 L 247,252 L 268,252 L 268,268 L 218,268 L 218,226"/>
+    <!-- Arm 180° (lower-left) -->
+    <path d="M 246,225 L 246,252 L 218,252 L 218,265 L 260,265 L 260,203"/>
+    <!-- Arm 270° (upper-left) -->
+    <path d="M 253,225 L 253,204 L 232,204 L 232,191 L 282,191 L 282,233"/>
+  </g>
+
+  <!-- Centre dot -->
+  <circle cx="250" cy="228" r="6" fill="#FFFFFF"/>
+
+  <!-- Lighter blue accent ring on arms -->
+  <g fill="none" stroke="#4A7FC1" stroke-width="1.5" stroke-linecap="square" opacity="0.5">
+    <path d="M 254,231 L 254,210 L 282,210 L 282,197 L 240,197 L 240,259"/>
+    <path d="M 247,231 L 247,252 L 268,252 L 268,268 L 218,268 L 218,226"/>
+    <path d="M 246,225 L 246,252 L 218,252 L 218,265 L 260,265 L 260,203"/>
+    <path d="M 253,225 L 253,204 L 232,204 L 232,191 L 282,191 L 282,233"/>
+  </g>
+
+  <!-- Shield label band -->
+  <rect x="158" y="335" width="184" height="28" fill="#FFFFFF" opacity="0.12"/>
+  <text x="250" y="355"
+        font-family="'Cormorant Garamond', Georgia, serif"
+        font-size="14" font-weight="700" fill="#FFFFFF"
+        text-anchor="middle" letter-spacing="4">INTEGRIS</text>
+</svg>

@@ -4,7 +4,7 @@ Mounted at /api/v1 in app/main.py.
 """
 from fastapi import APIRouter
 
-from app.api.v1 import ai, auth, contact, datasets, edc, findings, studies, validation
+from app.api.v1 import ai, auth, contact, datasets, edc, findings, studies, validation, reports
 
 v1_router = APIRouter(prefix="/api/v1")
 
@@ -16,3 +16,4 @@ v1_router.include_router(findings.router)
 v1_router.include_router(contact.router)
 v1_router.include_router(ai.router)
 v1_router.include_router(edc.router)
+v1_router.include_router(reports.router)

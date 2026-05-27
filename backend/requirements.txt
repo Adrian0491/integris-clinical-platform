@@ -48,3 +48,4 @@ anthropic>=0.25.0
 # ── EDC connectors ────────────────────────────────────────────────────────────
 requests>=2.31.0,<3.0.0       # REDCap connector (sync HTTP — see edcconnector note)
 httpx>=0.27.0,<1.0.0          # async HTTP for future connectors
+reportlab>=4.0.0       # PDF report generation
