@@ -29,7 +29,28 @@ def run_validation(
     db:           Session = Depends(get_db),
     current_user: User    = Depends(require_validator),
 ):
-    """Submit a validation job. Returns immediately; Celery runs it asynchronously."""
+    """
+    Submit a validation job and run it synchronously.
+
+    # TODO: ASYNC IMPLEMENTATION REQUIRED BEFORE PRODUCTION LAUNCH
+    # ---------------------------------------------------------------
+    # This endpoint currently runs validation synchronously (blocking).
+    # Once the platform is live with paying clients, this must be
+    # converted to use Celery + Redis for async task processing.
+    #
+    # Required infrastructure:
+    #   - GCP Memorystore Redis (Basic M1, ~$36/month)
+    #   - Celery worker deployed as a separate Cloud Run service
+    #   - REDIS_URL env var set in Cloud Run
+    #
+    # To re-enable async, restore the original implementation:
+    #   result = run_validation_job.apply_async(
+    #       args=[str(job.id)],
+    #       queue="validation",
+    #   )
+    #   job.celery_task_id = result.id
+    # ---------------------------------------------------------------
+    """
     from app.workers.tasks import run_validation_job
 
     job = ValidationJob(
@@ -43,14 +64,10 @@ def run_validation(
     db.add(job)
     db.commit()
 
-    # Enqueue Celery task
-    result = run_validation_job.apply_async(
-        args=[str(job.id)],
-        queue="validation",
-    )
-    job.celery_task_id = result.id
-    db.commit()
+    # Run synchronously (bypassing Celery for dev — see TODO above)
+    run_validation_job(str(job.id))
 
+    db.refresh(job)
     return job
 
 
