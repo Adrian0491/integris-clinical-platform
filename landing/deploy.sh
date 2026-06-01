@@ -32,21 +32,21 @@ cp config.js config.js.bak
 if [[ "${ENV}" == "production" ]]; then
   cat > config.js <<'EOF'
 window.INTEGRIS_CONFIG = {
-  API_BASE_URL: 'https://api.integris-clinical.com',
-  APP_URL:      'https://app.integris-clinical.com',
+  API_BASE_URL: 'https://api.integrisclinicalservices.com',
+  APP_URL:      'https://app.integrisclinicalservices.com',
   get CONTACT_URL() { return this.API_BASE_URL + '/api/v1/contact'; },
 };
 EOF
   echo "  config.js patched for production"
-elif [[ "${ENV}" == "staging" ]]; then
+elif [[ "${ENV}" == "dev" ]]; then
   cat > config.js <<'EOF'
 window.INTEGRIS_CONFIG = {
-  API_BASE_URL: 'https://api-staging.integris-clinical.com',
-  APP_URL:      'https://app-staging.integris-clinical.com',
+  API_BASE_URL: 'https://integris-backend-dev-937675960249.europe-west1.run.app',
+  APP_URL:      'https://integris-frontend-dev-937675960249.europe-west1.run.app',
   get CONTACT_URL() { return this.API_BASE_URL + '/api/v1/contact'; },
 };
 EOF
-  echo "  config.js patched for staging"
+  echo "  config.js patched for dev"
 else
   echo "  config.js left as-is (development / local)"
 fi
