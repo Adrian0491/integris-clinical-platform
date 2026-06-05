@@ -63,3 +63,11 @@
   color: var(--mat-sys-on-surface-variant);
   opacity: .7;
 }
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}

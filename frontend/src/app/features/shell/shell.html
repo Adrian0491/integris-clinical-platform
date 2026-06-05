@@ -18,7 +18,7 @@
         <a mat-list-item
            [routerLink]="item.route"
            routerLinkActive="active-link"
-           [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+           [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' || item.route === '/validation' }"
            (click)="isHandset() && sidenav.close()">
           <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
           <span matListItemTitle>{{ item.label }}</span>
