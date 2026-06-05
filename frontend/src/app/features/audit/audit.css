@@ -62,3 +62,15 @@
 }
 
 .audit-row:hover { background: var(--mat-sys-surface-container-low); }
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filter-bar mat-form-field {
+  margin-bottom: -1.25em;
+}

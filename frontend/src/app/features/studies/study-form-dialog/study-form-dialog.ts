@@ -12,6 +12,7 @@ import { Study } from '../../../core/models';
 
 @Component({
   selector: 'app-study-form-dialog',
+  styleUrls: ['./study-form-dialog.css'],
   imports: [
     ReactiveFormsModule,
     MatDialogModule, MatFormFieldModule, MatInputModule,
