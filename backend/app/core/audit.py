@@ -1,18 +1,6 @@
 """
-21 CFR Part 11 audit trail — implemented entirely through SQLAlchemy events.
-
-Architecture
-------------
-1. Request context is stored in a ContextVar by rbac.get_current_user().
-2. after_flush listener captures new/dirty/deleted rows for auditable models.
-3. after_commit listener writes those entries to a separate DB session so
-   they never share the fate of the main transaction.
-
-No audit calls appear in endpoint code.
-
-Audited models (by table name):
-    studies, datasets, validation_jobs, findings,
-    compliance_reports, electronic_signatures, users
+21 CFR Part 11 audit trail — implemented through SQLAlchemy events.
+Audit context is stored in session.info to avoid ContextVar threading issues.
 """
 from __future__ import annotations
 
@@ -20,20 +8,12 @@ import hashlib
 import json
 import threading
 from contextlib import contextmanager
-from contextvars import ContextVar
 from datetime import datetime, timezone
 from typing import Any
 
 from sqlalchemy import event
 from sqlalchemy.orm import Session
 
-# ---------------------------------------------------------------------------
-# Request-scoped context
-# ---------------------------------------------------------------------------
-
-_audit_ctx: ContextVar[dict[str, Any]] = ContextVar("audit_ctx", default={})
-
-# Guard against re-entrant flushes triggered by writing AuditLog rows.
 _flush_guard = threading.local()
 
 _AUDITABLE_TABLES = frozenset({
@@ -47,44 +27,25 @@ _AUDITABLE_TABLES = frozenset({
 })
 
 
-def set_audit_context(
-    user_id: str,
-    tenant_id: str,
-    ip_address: str | None = None,
-    user_agent: str | None = None,
-) -> None:
-    _audit_ctx.set({
-        "user_id":    user_id,
-        "tenant_id":  tenant_id,
-        "ip_address": ip_address,
-        "user_agent": user_agent,
-    })
+# Keep these for backward compatibility with any code that calls them
+def set_audit_context(user_id: str, tenant_id: str, ip_address: str | None = None, user_agent: str | None = None) -> None:
+    pass
 
 
 def clear_audit_context() -> None:
-    _audit_ctx.set({})
+    pass
 
 
 def get_audit_context() -> dict[str, Any]:
-    return _audit_ctx.get({})
+    return {}
 
 
 @contextmanager
 def audit_as(user_id: str, tenant_id: str):
-    """Context manager for non-HTTP code (e.g. Celery tasks) that mutates data."""
-    set_audit_context(user_id=user_id, tenant_id=tenant_id)
-    try:
-        yield
-    finally:
-        clear_audit_context()
+    yield
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 
 def _instance_hash(instance: Any) -> str:
-    """SHA-256 of a sorted JSON representation of the instance's column values."""
     try:
         from sqlalchemy import inspect as sa_inspect
         state = sa_inspect(instance)
@@ -107,35 +68,32 @@ def _safe_uuid(instance: Any) -> str | None:
         return None
 
 
-def _safe_tenant(instance: Any, ctx: dict) -> str | None:
+def _safe_tenant(instance: Any, tenant_id: str | None) -> str | None:
     try:
         val = getattr(instance, "tenant_id", None)
-        return str(val) if val is not None else ctx.get("tenant_id")
+        return str(val) if val is not None else tenant_id
     except Exception:
-        return ctx.get("tenant_id")
+        return tenant_id
 
-
-# ---------------------------------------------------------------------------
-# Event listeners
-# ---------------------------------------------------------------------------
 
 def register_audit_listeners(session_factory) -> None:
-    """
-    Register after_flush and after_commit listeners on `session_factory`.
-    Call once during application startup (app/main.py).
-    """
+    """Register after_flush and after_commit listeners on session_factory."""
 
     @event.listens_for(session_factory, "after_flush")
     def _capture(session: Session, flush_context) -> None:
-        # Skip if we are already inside an audit write to prevent recursion.
         if getattr(_flush_guard, "active", False):
             return
 
-        ctx = get_audit_context()
-        if not ctx.get("user_id"):
+        # Read audit context from session.info instead of ContextVar
+        user_id = session.info.get('audit_user_id')
+        tenant_id = session.info.get('audit_tenant_id')
+        ip_address = session.info.get('ip_address')
+        user_agent = session.info.get('user_agent')
+
+        if not user_id:
             return
 
-        from app.models.audit import AuditLog  # late import — avoids circular
+        from app.models.audit import AuditLog
 
         pending: list[dict] = []
 
@@ -147,10 +105,10 @@ def register_audit_listeners(session_factory) -> None:
                 "action":      f"{table}.{action_suffix}",
                 "target_type": type(instance).__name__,
                 "target_id":   _safe_uuid(instance),
-                "tenant_id":   _safe_tenant(instance, ctx),
-                "user_id":     ctx.get("user_id"),
-                "ip_address":  ctx.get("ip_address"),
-                "user_agent":  ctx.get("user_agent"),
+                "tenant_id":   _safe_tenant(instance, tenant_id),
+                "user_id":     user_id,
+                "ip_address":  ip_address,
+                "user_agent":  user_agent,
                 "before_hash": before,
                 "after_hash":  after,
             })
@@ -183,7 +141,7 @@ def register_audit_listeners(session_factory) -> None:
         entries, session._audit_queue = queue[:], []
 
         from app.models.audit import AuditLog
-        from app.database import SessionLocal as _SL  # fresh session
+        from app.database import SessionLocal as _SL
 
         audit_session = _SL()
         _flush_guard.active = True
@@ -198,7 +156,7 @@ def register_audit_listeners(session_factory) -> None:
                     ip_address=data.get("ip_address"),
                     user_agent=data.get("user_agent"),
                     before_hash=data.get("before_hash") or None,
-                    after_hash=data.get("after_hash")  or None,
+                    after_hash=data.get("after_hash") or None,
                     occurred_at=datetime.now(timezone.utc),
                 ))
             audit_session.commit()
