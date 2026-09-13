@@ -1,6 +1,6 @@
 # Security Policy — Integris Clinical Platform
 
-**Integris Clinical Services LLC** takes the security of its platform seriously. The Integris Clinical Platform processes Protected Health Information (PHI) and is designed to meet HIPAA Security Rule requirements. We appreciate responsible disclosure from security researchers.
+**Integris Clinical Services** takes the security of its platform seriously. The Integris Clinical Platform processes Protected Health Information (PHI) and is designed to meet HIPAA Security Rule requirements. We appreciate responsible disclosure from security researchers.
 
 ---
 
@@ -156,4 +156,4 @@ We do not currently operate a formal paid bug bounty program. We do publicly cre
 
 ---
 
-© 2026 Integris Clinical Services LLC
+© 2026 Integris Clinical Services
