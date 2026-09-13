@@ -8,7 +8,7 @@ Built by **George Adrian Pircalaboiu**. U.S. company in formation.
 
 Not a production deployment. Not FDA-certified.
 
-Developed and maintained by **George Adrian Pircalaboiu**, Founder & CEO/CTO of **Integris Clinical Services*.
+Developed and maintained by **George Adrian Pircalaboiu**, Founder & CEO/CTO of **Integris Clinical Services**.
 
 ---
 
