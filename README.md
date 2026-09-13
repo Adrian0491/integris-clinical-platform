@@ -503,11 +503,10 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history from v0.1.0 (proto
 
 ## About
 
-**Integris Clinical Services LLC**  
-San Antonio, Texas, United States
+**Integris Clinical Services**
 
 Building modern clinical data infrastructure for the US clinical research industry.
 
 ---
 
-*This repository contains proprietary software. © 2026 Integris Clinical Services LLC. All rights reserved.*
+*This repository contains proprietary software. © 2026 Integris Clinical Services. All rights reserved.*
