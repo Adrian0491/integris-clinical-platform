@@ -293,4 +293,4 @@ Reviewers should verify:
 
 Open a GitHub Discussion or reach out to the engineering team at **engineering@integris-clinical.com**.
 
-© 2026 Integris Clinical Services LLC
+© 2026 Integris Clinical Services
