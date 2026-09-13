@@ -1,8 +1,12 @@
 # Integris Clinical Platform
 
-> **Status: Active Development — v0.8 (targeting v1.0 release mid Q4 2026)**
+> **Status: Active development — v0.8 (target v1.0 mid Q4 2026)**
 
-A proprietary, cloud-native SaaS platform for clinical data validation and regulatory compliance, built for Contract Research Organizations (CROs) and pharmaceutical sponsors operating under FDA and EMA standards.
+Clinical data validation SaaS for CROs and sponsors (CDISC/SDTM, Dataset-JSON).
+
+Built by **George Adrian Pircalaboiu**. U.S. company in formation.
+
+Not a production deployment. Not FDA-certified.
 
 Developed and maintained by **George Adrian Pircalaboiu**, Founder & CEO/CTO of **Integris Clinical Services*.
 
@@ -503,10 +507,8 @@ See [CHANGELOG.md](CHANGELOG.md) for the full version history from v0.1.0 (proto
 
 ## About
 
-**Integris Clinical Services**
+Integris Clinical Services (U.S. entity in formation)
 
-Building modern clinical data infrastructure for the US clinical research industry.
+© 2026 George Adrian Pircalaboiu. All rights reserved.
 
 ---
-
-*This repository contains proprietary software. © 2026 Integris Clinical Services. All rights reserved.*
